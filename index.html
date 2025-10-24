@@ -22,7 +22,12 @@
     --line-strong: rgba(255,255,255,.32);
   }
   *{box-sizing:border-box}
-  html,body{margin:0; padding:0; background:radial-gradient(1200px 600px at 20% -10%, #2b1b5d 0%, #120a24 42%, #0c0720 100%); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+  html,body{
+    margin:0; padding:0;
+    background:radial-gradient(1200px 600px at 20% -10%, #2b1b5d 0%, #120a24 42%, #0c0720 100%);
+    color:var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  }
 
   header{
     position:sticky; top:0; z-index:50;
@@ -95,14 +100,23 @@
   .kpis .name{font-size:12px; color:var(--muted)}
   .kpis .val{font-size:18px; font-weight:800; margin-top:6px}
 
-  /* Tabelas */
+  /* Tabelas genéricas */
   table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px; border:1px solid var(--line)}
-  thead th{position:sticky; top:0; background:#1a1440; color:#eae6ff; font-weight:800; font-size:12px; text-align:left; padding:10px; border-bottom:1px solid var(--line); white-space:nowrap}
-  tbody td{padding:10px; border-bottom:1px solid var(--line); font-size:13px; white-space:nowrap}
+  thead th{
+    position:sticky; top:0;
+    background:#1a1440; color:#eae6ff;
+    font-weight:800; font-size:12px; text-align:left;
+    padding:10px; border-bottom:1px solid var(--line)
+  }
+  tbody td{
+    padding:10px; border-bottom:1px solid var(--line); font-size:13px;
+    vertical-align:top;
+  }
+
   .col-num{width:56px}
   .col-preco{width:160px}
   .col-qt{width:100px}
-  .col-total{width:180px; text-align:right}
+  .col-total{text-align:right; white-space:nowrap}
 
   .ok{color:var(--ok)} .bad{color:var(--bad)}
 
@@ -111,17 +125,20 @@
     position:fixed; inset:0; display:none; place-items:center;
     background:rgba(10,6,20,.8); backdrop-filter: blur(4px); z-index:1000;
     color:var(--text);
-    color-scheme: dark; /* ajuda a forçar tema escuro nativo */
   }
   .overlay .dialog{
-    width:min(820px, 92vw); background:linear-gradient(180deg, #1e1648,#130c2a); border:1px solid var(--line-strong); border-radius:16px; padding:16px; box-shadow: 0 30px 50px rgba(0,0,0,.45);
+    width:min(820px, 92vw);
+    background:linear-gradient(180deg, #1e1648,#130c2a);
+    border:1px solid var(--line-strong); border-radius:16px; padding:16px;
+    box-shadow: 0 30px 50px rgba(0,0,0,.45);
     color:var(--text);
   }
   .overlay .dialog h3{color:#fff}
-  .overlay .dialog .footer{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
+  .overlay .dialog .footer{
+    display:flex; gap:8px; justify-content:flex-end; margin-top:12px
+  }
   .overlay.show{display:grid}
-
-  /* Inputs fortes dentro dos modais (contraste) */
+  /* Inputs fortes nos modals (contraste) */
   .overlay .dialog input[type="text"],
   .overlay .dialog input[type="email"],
   .overlay .dialog input[type="password"],
@@ -137,23 +154,6 @@
     background:linear-gradient(180deg, var(--brand), var(--brand-2)); color:#fff;
   }
 
-  /* === Correção extra de contraste do dropdown nativo === */
-  .overlay select,
-  .overlay option{
-    background-color:#1a1238 !important;
-    color:#F2EDFF !important;
-  }
-  .overlay select:focus,
-  .overlay option:focus,
-  .overlay option:hover{
-    background-color:#29184E !important;
-    color:#FFFFFF !important;
-  }
-  .overlay select::-ms-expand{ /* seta do IE/Edge antigo */
-    background-color:#1a1238;
-    color:#F2EDFF;
-  }
-
   /* Printable orçamento */
   #orcamentoPrint{display:none}
   @media print{
@@ -167,46 +167,52 @@
     #orcamentoPrint tbody td{color:#000; border-color:#000}
     #orcamentoPrint .grand{color:#000}
   }
- }
 
-  /* ===== CORREÇÃO DE CONTRASTE DOS SELECTS ===== */
-  select, option {
-    background-color: #1a1238 !important; /* fundo roxo escuro */
-    color: #F2EDFF !important;            /* texto lilás claro */
-  }
-  select:focus, option:focus, option:hover {
-    background-color: #29184E !important; /* roxo principal da marca */
-    color: #FFFFFF !important;             /* texto branco */
-  }
-  select::-ms-expand {
-    background-color: #1a1238;
-    color: #F2EDFF;
-  }
-
-  /* ===== COLAPSÁVEIS PARA A SEÇÃO 6 ===== */
-  details.collapse{
-    border:1px solid var(--line);
-    border-radius:12px;
+  /* ===== NOVO: Accordion da Simulação ===== */
+  .simBlock{
     background:#1a1440;
-    margin-top:12px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    margin-top:16px;
     overflow:hidden;
   }
-  details.collapse > summary{
-    list-style:none;
+  .simHeader{
     cursor:pointer;
-    padding:12px 12px;
-    font-weight:800;
-    color:#fff;
+    user-select:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 16px;
     background:#1a1440;
     border-bottom:1px solid var(--line);
-    display:flex; align-items:center; gap:8px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
   }
-  details.collapse > summary::-webkit-details-marker{display:none}
-  .chev{transition:transform .2s ease}
-  details[open] .chev{transform:rotate(90deg)}
-  .scroll-x{overflow-x:auto; width:100%}
-  .sticky-first th:first-child, .sticky-first td:first-child{
-    position:sticky; left:0; background:#1a1440; z-index:1;
+  .simHeader .arrow{
+    font-size:12px;
+    line-height:1;
+    color:var(--muted);
+    transition:transform .15s;
+  }
+  .simBlock.collapsed .arrow{
+    transform:rotate(-90deg);
+  }
+  .simContent{
+    padding:16px;
+  }
+  .simContent table{
+    border-radius:12px;
+  }
+
+  /* saldo table stays always visible look */
+  #saldoWrapper{
+    background:#1a1440;
+    border:1px solid var(--line);
+    border-radius:14px;
+    margin-top:16px;
+    overflow-x:auto;
   }
 </style>
 </head>
@@ -470,7 +476,7 @@
     </div>
   </div>
 
-  <!-- 6) SIMULAÇÃO POR MÊS (ATUALIZADA) -->
+  <!-- 6) SIMULAÇÃO POR MÊS -->
   <div class="tab-panel" id="t6">
     <div class="row">
       <label>Meses para simular
@@ -483,27 +489,56 @@
       </div>
     </div>
 
-    <!-- Receitas (colapsável) -->
-    <details class="collapse" open>
-      <summary><span class="chev">▶</span> Receitas</summary>
-      <div class="scroll-x" style="padding:12px">
-        <table id="gridReceitas" class="sticky-first">
-          <thead><tr id="gridReceitasHead"></tr></thead>
-          <tbody id="gridReceitasBody"></tbody>
-        </table>
+    <!-- Accordion Receitas -->
+    <div id="receitasBlock" class="simBlock">
+      <div class="simHeader" data-accordion="receitas">
+        <div>▲ Receitas</div>
+        <div class="arrow">▼</div>
       </div>
-    </details>
+      <div class="simContent">
+        <div style="overflow-x:auto;">
+          <table id="tblReceitas">
+            <thead>
+              <tr id="headReceitas"><th>Item \ Mês</th></tr>
+            </thead>
+            <tbody id="bodyReceitas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-    <!-- Despesas / Saldos (colapsável) -->
-    <details class="collapse" open style="margin-top:12px">
-      <summary><span class="chev">▶</span> Despesas</summary>
-      <div class="scroll-x" style="padding:12px">
-        <table id="gridSaldos" class="sticky-first">
-          <thead><tr id="gridSaldosHead"></tr></thead>
-          <tbody id="gridSaldosBody"></tbody>
+    <!-- Accordion Despesas -->
+    <div id="despesasBlock" class="simBlock">
+      <div class="simHeader" data-accordion="despesas">
+        <div>▲ Despesas</div>
+        <div class="arrow">▼</div>
+      </div>
+      <div class="simContent">
+        <div style="overflow-x:auto;">
+          <table id="tblDespesas">
+            <thead>
+              <tr id="headDespesas"><th>Item \ Mês</th></tr>
+            </thead>
+            <tbody id="bodyDespesas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saldo (sempre visível) -->
+    <div id="saldoWrapper">
+      <div style="overflow-x:auto;">
+        <table id="tblSaldo">
+          <thead>
+            <tr id="headSaldo">
+              <th>Item \ Mês</th>
+            </tr>
+          </thead>
+          <tbody id="bodySaldo"></tbody>
         </table>
       </div>
-    </details>
+    </div>
+
   </div>
 </div>
 
@@ -626,6 +661,7 @@
 </div>
 
 <!-- Libs -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -648,7 +684,10 @@ const pctToNum = s=>{
   const n = parseFloat(String(s).replace('%','').replace(',','.'));
   return isNaN(n)?0:n;
 };
-const setMoney2 = (el)=>{ const n = moneyToNum(el.value); el.value = (isNaN(n)?0:n).toFixed(2).replace('.',','); };
+const setMoney2 = (el)=>{
+  const n = moneyToNum(el.value);
+  el.value = (isNaN(n)?0:n).toFixed(2).replace('.',',');
+};
 const storageKey='camerite_calc_v4';
 const I = id => parseInt($('#'+id)?.value||0);
 const M = id => moneyToNum($('#'+id)?.value||0);
@@ -668,7 +707,10 @@ $('#modeloProduto').addEventListener('click', ()=> setModelo('produto'));
 /* ===== Custos base ===== */
 const custoArmazenamentoMap = {1:15, 3:19, 7:27, 30:45};
 const custoOCR = 45;
-function custoArmSelecionado(){ const dias = parseInt($('#armazenamentoDias').value||7); return custoArmazenamentoMap[dias] || 27; }
+function custoArmSelecionado(){
+  const dias = parseInt($('#armazenamentoDias').value||7);
+  return custoArmazenamentoMap[dias] || 27;
+}
 
 /* ===== Abas ===== */
 $$('.tabs button').forEach(b=>{
@@ -693,6 +735,69 @@ $('#btnPrintOnly').addEventListener('click', ()=>{
   setTimeout(()=>window.print(), 10);
 });
 
+/* ====== PDF: gerar a partir de proposta (upload) ====== */
+async function captureOrcamentoPNGBytes(){
+  buildPrintable();
+  const node = document.querySelector('#orcamentoPrint .container');
+  const canvas = await html2canvas(node, {backgroundColor:'#ffffff', scale:2});
+
+  if (canvas.toBlob) {
+    const blob = await new Promise(res => canvas.toBlob(b => res(b), 'image/png'));
+    const buf = await blob.arrayBuffer();
+    return new Uint8Array(buf);
+  } else {
+    const dataUrl = canvas.toDataURL('image/png');
+    const base64 = dataUrl.split(',')[1];
+    const bin = atob(base64);
+    const len = bin.length;
+    const bytes = new Uint8Array(len);
+    for (let i=0; i<len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+}
+
+$('#btnGenerateFromPdf').addEventListener('click', async ()=>{
+  const file = $('#pdfBaseFile').files?.[0];
+  const mode = $('#pdfInsertMode').value; // 'nova' | 'ultima'
+  const err = $('#pdfError'); err.style.display='none'; err.textContent='';
+  if(!file){ err.textContent='Selecione um PDF de proposta.'; err.style.display='block'; return; }
+
+  try{
+    const pngBytes = await captureOrcamentoPNGBytes();
+
+    const arrayBuf = await file.arrayBuffer();
+    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuf);
+    const pngImage = await pdfDoc.embedPng(pngBytes);
+
+    if(mode==='nova'){
+      const page = pdfDoc.addPage();
+      const { width, height } = page.getSize();
+      const pngAspect = pngImage.width / pngImage.height;
+      let drawW = width, drawH = width / pngAspect;
+      if(drawH>height){ drawH=height; drawW=height*pngAspect; }
+      const x = (width - drawW)/2, y = (height - drawH)/2;
+      page.drawImage(pngImage, {x, y, width:drawW, height:drawH});
+    }else{
+      const pages = pdfDoc.getPages();
+      const last = pages[pages.length-1];
+      const { width, height } = last.getSize();
+      last.drawImage(pngImage,{x:0,y:0,width:width,height:height});
+    }
+
+    const out = await pdfDoc.save();
+    const blob = new Blob([out], {type:'application/pdf'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download='proposta-camerite.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+    $('#overlayPdf').classList.remove('show');
+  }catch(e){
+    err.textContent = 'Falha ao gerar PDF: ' + (e?.message||e);
+    err.style.display='block';
+  }
+});
+
 /* ===== Estado ===== */
 function collectState(){
   const ids = [
@@ -708,7 +813,9 @@ function collectState(){
   ids.forEach(id=>{
     const el = $('#'+id);
     if(!el) return;
-    st[id] = (el.tagName==='SELECT' || el.type==='checkbox') ? (el.type==='checkbox'? el.checked : el.value) : el.value;
+    st[id] = (el.tagName==='SELECT' || el.type==='checkbox')
+      ? (el.type==='checkbox'? el.checked : el.value)
+      : el.value;
   });
   st.modelo = getModelo();
   return st;
@@ -725,41 +832,19 @@ function load(){
   setModelo(obj.modelo||'usuario');
 }
 
-/* ===== Reset total ===== */
-function resetAll(){
-  localStorage.removeItem(storageKey);
-  $$('#tabs input[type="text"], #tabs input[type="number"]').forEach(el=> el.value = '');
-  $$('#tabs input[type="checkbox"]').forEach(el=> el.checked = false);
+/* formatação monetária ao sair do campo */
+document.addEventListener('blur', (e)=>{
+  if(e.target && e.target.matches('input[inputmode="decimal"]')) setMoney2(e.target);
+}, true);
 
-  $('#meses').value = '12';
-  $('#armazenamentoDias').value = '7';
-  $('#instMargemPct').value = '15';
-  $('#eqTipoLPR').value = 'aquisicao';
-  $('#eqTipoPMI').value = 'aquisicao';
-  $('#pdfInsertMode').value = 'nova';
-  setModelo('usuario');
-
-  $('#overlayProdutoCustos').classList.remove('show');
-  $('#overlayPdf').classList.remove('show');
-
-  computeAll();
-  save();
-}
-$('#btnApagar').addEventListener('click', resetAll);
-
-/* ===== Botões de meses (aba 6) ===== */
-function clampMeses(n){ return Math.max(1, Math.min(60, n|0)); }
-$('#maisMes').addEventListener('click', ()=>{
-  $('#meses').value = clampMeses(I('meses') + 1);
-  computeAll(); save();
+/* inputs disparam recálculo/persistência */
+['input','change'].forEach(evt=>{
+  document.body.addEventListener(evt, (e)=>{
+    if(e.target.matches('input,select')){ computeAll(); save(); }
+  });
 });
-$('#menosMes').addEventListener('click', ()=>{
-  $('#meses').value = clampMeses(I('meses') - 1);
-  computeAll(); save();
-});
-$('#recalc').addEventListener('click', ()=>{ computeAll(); save(); });
 
-/* ====== Cálculos ====== */
+/* ===== Cálculos helpers ===== */
 function receitaMensalBase(){
   const m = getModelo();
   if(m==='usuario'){
@@ -784,17 +869,34 @@ function calcImplantacao(){
   return {subtotal, margemVal, total};
 }
 function calcDespesaArmazenamento(){
+  // qtdBase = totens*4 + armazenamento + PMI
   const qtdBase = I('qtdToten')*4 + I('qtdArmazenamento') + I('qtdPMI');
   const r1 = qtdBase * custoArmSelecionado();
   const r2 = I('qtdOCR') * custoOCR;
   return r1 + r2;
 }
 function calcDespesaCameraPMI(m){
+  // custo PMI/Câmera
   const qtdBase = I('qtdToten')*4 + I('qtdPMI');
-  const val = M('eqValPMI') * qtdBase;
-  const tipo = $('#eqTipoPMI').value || 'aquisicao';
-  if(tipo==='aquisicao'){ return m===0 ? val : 0; }
-  return m>=1 ? val : 0;
+  const valPMI   = M('eqValPMI') * qtdBase;
+  const tipoPMI  = $('#eqTipoPMI').value || 'aquisicao';
+  // LPR (câmera LPR única ou múltipla):
+  const valLPR   = M('eqValLPR'); // se quiser multiplicar por qtdLPR depois, adaptar
+  const tipoLPR  = $('#eqTipoLPR').value || 'aquisicao';
+
+  let totalCapex = 0;
+  let totalOpex  = 0;
+
+  // PMI
+  if(tipoPMI==='aquisicao'){ totalCapex += valPMI; } else { totalOpex += valPMI; }
+  // LPR
+  if(tipoLPR==='aquisicao'){ totalCapex += valLPR; } else { totalOpex += valLPR; }
+
+  // retorno por mês:
+  // mês 0 recebe capex, meses >=1 recebem opex
+  if(m===0) return totalCapex;
+  if(m>=1)  return totalOpex;
+  return 0;
 }
 function fixosMensais(){
   const internet = I('fxQtdInternet') * M('fxValInternet');
@@ -814,136 +916,215 @@ function impostosDoMes(receita, custosSemImp){
   return {impM, impF, total: impM + impF};
 }
 
-/* ===== Tabelas em grade (item x mês) — seção 6 ===== */
-function receitasItensPorMes(meses){
-  const modelo = getModelo();
-  const itens = [];
-
-  if(modelo === 'usuario'){
-    const base = I('qtdUsuarios') * M('pvPorUsuario');
-    itens.push({nome:'Plano por Usuário', serie: Array.from({length:meses+1}, (_,m)=> m===0?0:base)});
-  } else {
-    const defs = [
-      {nome:'Armazenamento', qt:I('qtdArmazenamento'), preco:M('pvArmazenamento')},
-      {nome:'Combo PMI',     qt:I('qtdPMI'),          preco:M('pvPMI')},
-      {nome:'Combo OCR',     qt:I('qtdOCR'),          preco:M('pvOCR')},
-      {nome:'Toten',         qt:I('qtdToten'),        preco:M('pvToten')},
-      {nome:'Det. Movimento',qt:I('qtdDetMov'),       preco:M('pvDetMov')},
-      {nome:'Det. Pessoas',  qt:I('qtdDetPes'),       preco:M('pvDetPes')},
-    ];
-    defs.forEach(d=>{
-      const v = (d.qt||0) * (d.preco||0);
-      itens.push({nome:d.nome, serie:Array.from({length:meses+1}, (_,m)=> m===0?0:v)});
-    });
-  }
-
-  const total = Array.from({length:meses+1}, (_,m)=>{
-    return itens.reduce((acc,it)=> acc + (it.serie[m]||0), 0);
-  });
-
-  return {itens, total};
-}
-
-function renderGridReceitas(meses){
-  const head = $('#gridReceitasHead');
-  const body = $('#gridReceitasBody');
-  head.innerHTML=''; body.innerHTML='';
-
-  head.insertAdjacentHTML('beforeend', `<th>Item \\ Mês</th>`);
-  for(let m=0;m<=meses;m++){
-    head.insertAdjacentHTML('beforeend', `<th>${m}</th>`);
-  }
-
-  const {itens, total} = receitasItensPorMes(meses);
-  itens.forEach(it=>{
-    let row = `<tr><td>${it.nome}</td>`;
-    for(let m=0;m<=meses;m++){ row += `<td>${BRL(it.serie[m]||0)}</td>`; }
-    row += `</tr>`;
-    body.insertAdjacentHTML('beforeend', row);
-  });
-
-  let totRow = `<tr><td style="font-weight:800">Receita Total</td>`;
-  for(let m=0;m<=meses;m++){ totRow += `<td style="font-weight:800">${BRL(total[m]||0)}</td>`; }
-  totRow += `</tr>`;
-  body.insertAdjacentHTML('beforeend', totRow);
-}
-
-function renderGridSaldos(meses, saldoMes, saldoAc){
-  const head = $('#gridSaldosHead');
-  const body = $('#gridSaldosBody');
-  head.innerHTML=''; body.innerHTML='';
-
-  head.insertAdjacentHTML('beforeend', `<th>Item \\ Mês</th>`);
-  for(let m=0;m<=meses;m++){
-    head.insertAdjacentHTML('beforeend', `<th>${m}</th>`);
-  }
-
-  let rowMes = `<tr><td>Saldo do Mês</td>`;
-  for(let m=0;m<=meses;m++){
-    const v = saldoMes[m]||0;
-    rowMes += `<td class="${v>=0?'ok':'bad'}">${BRL(v)}</td>`;
-  }
-  rowMes += `</tr>`;
-  body.insertAdjacentHTML('beforeend', rowMes);
-
-  let rowAc = `<tr><td>Saldo Acumulado</td>`;
-  for(let m=0;m<=meses;m++){
-    const v = saldoAc[m]||0;
-    rowAc += `<td class="${v>=0?'ok':'bad'}">${BRL(v)}</td>`;
-  }
-  rowAc += `</tr>`;
-  body.insertAdjacentHTML('beforeend', rowAc);
-}
-
-/* ===== Simulação e KPIs ===== */
+/* ===== NOVO buildSimulacao (accordion) ===== */
 function buildSimulacao(){
   const meses = I('meses');
-  const recMes = []; const despMes = []; const impMes = []; const saldoMes = []; const saldoAc = [];
-  const implant = calcImplantacao().total;
 
+  // headers
+  const headReceitas = $('#headReceitas');
+  const headDespesas = $('#headDespesas');
+  const headSaldo    = $('#headSaldo');
+  headReceitas.innerHTML = '<th>Item \\ Mês</th>';
+  headDespesas.innerHTML = '<th>Item \\ Mês</th>';
+  headSaldo.innerHTML    = '<th>Item \\ Mês</th>';
   for(let m=0;m<=meses;m++){
-    let rec = 0;
-    if(m===0 && implant>0){ rec += implant; }
-    if(m>=1){ rec += receitaMensalBase(); }
-
-    let desp = 0;
-    if(m>=1){
-      const arm = calcDespesaArmazenamento(); desp+=arm;
-      const fix = fixosMensais();
-      desp+=fix.internet + fix.energia + fix.fundo + fix.roy + fix.despFin;
-    }
-    desp += calcDespesaCameraPMI(m);
-
-    const imp = impostosDoMes(rec, desp);
-    const totalDespesas = desp + imp.total;
-
-    const saldo = rec - totalDespesas;
-    saldoMes.push(saldo);
-    saldoAc.push((saldoAc[m-1]||0) + saldo);
-
-    recMes.push(rec);
-    despMes.push(totalDespesas);
-    impMes.push(imp.total);
+    headReceitas.innerHTML += `<th style="white-space:nowrap">${m}</th>`;
+    headDespesas.innerHTML += `<th style="white-space:nowrap">${m}</th>`;
+    headSaldo.innerHTML    += `<th style="white-space:nowrap">${m}</th>`;
   }
 
-  renderGridReceitas(meses);
-  renderGridSaldos(meses, saldoMes, saldoAc);
+  const bodyReceitas = $('#bodyReceitas'); bodyReceitas.innerHTML='';
+  const bodyDespesas = $('#bodyDespesas'); bodyDespesas.innerHTML='';
+  const bodySaldo    = $('#bodySaldo');    bodySaldo.innerHTML='';
+
+  // arrays finais para KPIs
+  const recMes = [];
+  const despMes = [];
+  const impMes = [];
+  const saldoMes = [];
+  const saldoAc = [];
+
+  const implant = calcImplantacao().total;
+
+  // vamos montar linhas dinâmicas
+  // Receitas possíveis
+  const receitasLinhas = {}; // {nomeItem: [mes0,mes1,...]}
+  const despesasLinhas = {}; // {nomeItem: [mes0,mes1,...]}
+  const saldoLinha     = { 'Saldo do Mês':[], 'Saldo Acumulado':[] };
+
+  let acumulado = 0;
+
+  for(let m=0;m<=meses;m++){
+    // RECEITA
+    let recTotalMes = 0;
+    if(m===0 && implant>0){
+      recTotalMes += implant;
+      if(!receitasLinhas['Implantação (receita única)']) receitasLinhas['Implantação (receita única)']=[];
+      receitasLinhas['Implantação (receita única)'][m] = implant;
+    }
+    if(m>=1){
+      const rBase = receitaMensalBase();
+      recTotalMes += rBase;
+      if(!receitasLinhas['Mensalidade']) receitasLinhas['Mensalidade']=[];
+      receitasLinhas['Mensalidade'][m] = rBase;
+    }
+
+    // DESPESA (sem impostos ainda)
+    let despSemImp = 0;
+
+    // Armazenamento / OCR
+    if(m>=1){
+      const arm = calcDespesaArmazenamento();
+      if(arm>0){
+        despSemImp += arm;
+        if(!despesasLinhas['Armazenamento']) despesasLinhas['Armazenamento']=[];
+        despesasLinhas['Armazenamento'][m] = arm;
+      }
+    }
+
+    // Equipamento (PMI/LPR etc.)
+    const camVal = calcDespesaCameraPMI(m);
+    if(camVal>0){
+      despSemImp += camVal;
+      if(!despesasLinhas['Câmera / PMI / LPR']) despesasLinhas['Câmera / PMI / LPR']=[];
+      despesasLinhas['Câmera / PMI / LPR'][m] = camVal;
+    }
+
+    // Fixos mensais
+    if(m>=1){
+      const fix = fixosMensais();
+      if(fix.internet>0){
+        despSemImp += fix.internet;
+        if(!despesasLinhas['Internet']) despesasLinhas['Internet']=[];
+        despesasLinhas['Internet'][m] = fix.internet;
+      }
+      if(fix.energia>0){
+        despSemImp += fix.energia;
+        if(!despesasLinhas['Energia']) despesasLinhas['Energia']=[];
+        despesasLinhas['Energia'][m] = fix.energia;
+      }
+      if(fix.fundo>0){
+        despSemImp += fix.fundo;
+        if(!despesasLinhas['Manutenção']) despesasLinhas['Manutenção']=[];
+        despesasLinhas['Manutenção'][m] = fix.fundo;
+      }
+      if(fix.roy>0){
+        despSemImp += fix.roy;
+        if(!despesasLinhas['Royalties']) despesasLinhas['Royalties']=[];
+        despesasLinhas['Royalties'][m] = fix.roy;
+      }
+      if(fix.despFin>0){
+        despSemImp += fix.despFin;
+        if(!despesasLinhas['Desp. Financeira']) despesasLinhas['Desp. Financeira']=[];
+        despesasLinhas['Desp. Financeira'][m] = fix.despFin;
+      }
+    }
+
+    // Impostos
+    const imp = impostosDoMes(recTotalMes, despSemImp);
+    const impTotal = imp.total;
+    if(impTotal>0){
+      if(!despesasLinhas['Impostos (Matriz+Franqueado)']) despesasLinhas['Impostos (Matriz+Franqueado)']=[];
+      despesasLinhas['Impostos (Matriz+Franqueado)'][m] = impTotal;
+    }
+
+    const despTotalMes = despSemImp + impTotal;
+
+    // Saldos
+    const saldo = recTotalMes - despTotalMes;
+    acumulado += saldo;
+
+    saldoLinha['Saldo do Mês'][m]       = saldo;
+    saldoLinha['Saldo Acumulado'][m]    = acumulado;
+
+    // guardar para KPIs
+    recMes[m]   = recTotalMes;
+    despMes[m]  = despTotalMes;
+    impMes[m]   = impTotal;
+    saldoMes[m] = saldo;
+    saldoAc[m]  = acumulado;
+  }
+
+  // render receitasLinhas
+  Object.keys(receitasLinhas).forEach(nome=>{
+    let rowHtml = `<tr><td>${nome}</td>`;
+    for(let m=0;m<=meses;m++){
+      const val = receitasLinhas[nome][m] || 0;
+      rowHtml += `<td class="col-total">${val?BRL(val):'R$ 0,00'}</td>`;
+    }
+    rowHtml += `</tr>`;
+    bodyReceitas.insertAdjacentHTML('beforeend', rowHtml);
+  });
+  // total Receita
+  let rowTotR = `<tr><td style="font-weight:700;color:${'var(--ok)'}">Receita Total</td>`;
+  for(let m=0;m<=meses;m++){
+    rowTotR += `<td class="col-total" style="font-weight:700;color:var(--ok)">${BRL(recMes[m]||0)}</td>`;
+  }
+  rowTotR += `</tr>`;
+  bodyReceitas.insertAdjacentHTML('beforeend', rowTotR);
+
+  // render despesasLinhas
+  Object.keys(despesasLinhas).forEach(nome=>{
+    let rowHtml = `<tr><td>${nome}</td>`;
+    for(let m=0;m<=meses;m++){
+      const val = despesasLinhas[nome][m] || 0;
+      rowHtml += `<td class="col-total">${val?BRL(val):'R$ 0,00'}</td>`;
+    }
+    rowHtml += `</tr>`;
+    bodyDespesas.insertAdjacentHTML('beforeend', rowHtml);
+  });
+  // total Despesa
+  let rowTotD = `<tr><td style="font-weight:700;color:var(--bad)">Despesa Total</td>`;
+  for(let m=0;m<=meses;m++){
+    rowTotD += `<td class="col-total" style="font-weight:700;color:var(--bad)">${BRL(despMes[m]||0)}</td>`;
+  }
+  rowTotD += `</tr>`;
+  bodyDespesas.insertAdjacentHTML('beforeend', rowTotD);
+
+  // render saldoLinha
+  // Saldo do Mês
+  let rowSaldoMes = `<tr><td>Saldo do Mês</td>`;
+  for(let m=0;m<=meses;m++){
+    const v = saldoLinha['Saldo do Mês'][m] || 0;
+    const cls = v>=0?'ok':'bad';
+    rowSaldoMes += `<td class="col-total ${cls}">${BRL(v)}</td>`;
+  }
+  rowSaldoMes += `</tr>`;
+  bodySaldo.insertAdjacentHTML('beforeend', rowSaldoMes);
+
+  // Saldo Acumulado
+  let rowSaldoAc = `<tr><td>Saldo Acumulado</td>`;
+  for(let m=0;m<=meses;m++){
+    const v = saldoLinha['Saldo Acumulado'][m] || 0;
+    const cls = v>=0?'ok':'bad';
+    rowSaldoAc += `<td class="col-total ${cls}">${BRL(v)}</td>`;
+  }
+  rowSaldoAc += `</tr>`;
+  bodySaldo.insertAdjacentHTML('beforeend', rowSaldoAc);
 
   return {recMes, despMes, impMes, saldoMes, saldoAc, implantacao: implant};
 }
+
+/* KPIs iguais */
 function updateKPIs(sim){
   const m1Rec = sim.recMes[1]||0;
   const m1Desp= sim.despMes[1]||0;
   const m1Imp = sim.impMes[1]||0;
 
-  let somaReceitas12 = 0; for(let i=1;i<=Math.min(12, sim.recMes.length-1);i++) somaReceitas12 += sim.recMes[i];
+  let somaReceitas12 = 0;
+  for(let i=1;i<=Math.min(12, sim.recMes.length-1);i++) somaReceitas12 += sim.recMes[i];
   const contratoAnual = somaReceitas12 + (sim.implantacao||0);
 
-  let somaDespesas12 = 0; for(let i=1;i<=Math.min(12, sim.despMes.length-1);i++) somaDespesas12 += sim.despMes[i];
+  let somaDespesas12 = 0;
+  for(let i=1;i<=Math.min(12, sim.despMes.length-1);i++) somaDespesas12 += sim.despMes[i];
 
-  let acum12 = 0; for(let i=0;i<=Math.min(12, sim.saldoMes.length-1);i++) acum12 += sim.saldoMes[i];
+  let acum12 = 0;
+  for(let i=0;i<=Math.min(12, sim.saldoMes.length-1);i++) acum12 += sim.saldoMes[i];
 
-  let mesEq = '—'; for(let i=0;i<sim.saldoAc.length;i++){ if(sim.saldoAc[i]>0){ mesEq = 'Mês '+String(i).padStart(2,'0'); break; } }
+  let mesEq = '—';
+  for(let i=0;i<sim.saldoAc.length;i++){
+    if(sim.saldoAc[i]>0){ mesEq = 'Mês '+String(i).padStart(2,'0'); break; }
+  }
 
   $('#kContratoAnual').textContent = BRL(contratoAnual);
   $('#kReceitaMes').textContent   = BRL(m1Rec);
@@ -951,206 +1132,82 @@ function updateKPIs(sim){
   $('#kImpostoMes').textContent   = BRL(m1Imp);
   $('#kCustoFranqueadoTotal').textContent = BRL(somaDespesas12);
   $('#kSaldoAcum12').textContent  = BRL(acum12);
+
   const rent = contratoAnual>0 ? (acum12/contratoAnual*100) : 0;
   $('#kRentab').textContent = (rent).toFixed(1).replace('.',',')+'%';
   $('#kMesEquilibrio').textContent = mesEq;
 }
+
 function buildPrintable(){
   const tbody = $('#tblOrc tbody'); tbody.innerHTML='';
-  const {rows, mensal} = buildBudgetRows();
-  rows.forEach(r=>{
-    tbody.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(r.i).padStart(2,'0')}</td><td>${r.desc}</td><td class="col-preco">${BRL(r.preco)}</td><td class="col-qt">${r.qt}</td><td class="col-total">${BRL(r.total)}</td></tr>`);
-  });
+  const modelo = getModelo();
+  let i=1, mensal=0;
+  function row(desc, preco, qt){
+    const total = preco*qt; mensal += total;
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td class="col-num">${String(i++).padStart(2,'0')}</td>
+        <td>${desc}</td>
+        <td class="col-preco">${BRL(preco)}</td>
+        <td class="col-qt">${qt}</td>
+        <td class="col-total">${BRL(total)}</td>
+      </tr>`);
+  }
+  if(modelo==='usuario'){
+    row('Plano por Usuário', M('pvPorUsuario'), I('qtdUsuarios'));
+  }else{
+    if(I('qtdArmazenamento')>0) row('Armazenamento', M('pvArmazenamento'), I('qtdArmazenamento'));
+    if(I('qtdPMI')>0)           row('PMI',            M('pvPMI'),           I('qtdPMI'));
+    if(I('qtdOCR')>0)           row('OCR',            M('pvOCR'),           I('qtdOCR'));
+    if(I('qtdToten')>0)         row('Toten',          M('pvToten'),         I('qtdToten'));
+    if(I('qtdDetMov')>0)        row('Detecção Movimento', M('pvDetMov'),    I('qtdDetMov'));
+    if(I('qtdDetPes')>0)        row('Detecção Pessoas',   M('pvDetPes'),    I('qtdDetPes'));
+  }
   $('#grandMensal').textContent = 'Mensalidade: ' + BRL(mensal);
 }
 
-/* ===== Monta linhas do orçamento (para DOM e PDF) ===== */
-function buildBudgetRows(){
-  const rows = [];
-  let i=1, mensal=0;
-  const modelo = getModelo();
-  function add(desc, preco, qt){
-    if(qt>0 && preco>0){
-      const total = preco*qt; mensal += total;
-      rows.push({ i:i++, desc, preco, qt, total });
-    }
-  }
-  if(modelo==='usuario'){
-    add('Plano por Usuário', M('pvPorUsuario'), I('qtdUsuarios'));
+/* ===== computeAll ===== */
+function computeAll(){
+  const sim = buildSimulacao();
+  updateKPIs(sim);
+}
+
+/* ===== Accordion toggle ===== */
+function toggleAccordion(blockId){
+  const block = document.getElementById(blockId+'Block');
+  if(!block) return;
+  block.classList.toggle('collapsed');
+  const content = block.querySelector('.simContent');
+  if(block.classList.contains('collapsed')){
+    content.style.display = 'none';
   }else{
-    add('Armazenamento', M('pvArmazenamento'), I('qtdArmazenamento'));
-    add('PMI',            M('pvPMI'),           I('qtdPMI'));
-    add('OCR',            M('pvOCR'),           I('qtdOCR'));
-    add('Toten',          M('pvToten'),         I('qtdToten'));
-    add('Detecção Movimento', M('pvDetMov'),    I('qtdDetMov'));
-    add('Detecção Pessoas',   M('pvDetPes'),    I('qtdDetPes'));
+    content.style.display = 'block';
   }
-  return {rows, mensal};
 }
-
-/* ===== PDF: desenha orçamento na página ===== */
-async function drawOrcamentoOnPage(pdfDoc, page, mode){
-  const { rows, mensal } = buildBudgetRows();
-  const { width, height } = page.getSize();
-
-  let margin = 40;
-  let colN = 28, colPreco = 90, colQt = 36, colTotal = 110;
-  let colDesc = width - 2*margin - colN - colPreco - colQt - colTotal;
-
-  let titleSize = 18;
-  let headSize = 11;
-  let bodySize = 10;
-  let lineH = 18;
-
-  const rgb = PDFLib.rgb;
-  const helv = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
-  const helvB = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-
-  function textLines(text, maxW, size){
-    const words = String(text).split(' ');
-    const out=[]; let cur='';
-    words.forEach(w=>{
-      const test=(cur?cur+' ':'')+w;
-      if(helv.widthOfTextAtSize(test, size) <= maxW) cur=test;
-      else{ if(cur) out.push(cur); cur=w; }
-    });
-    if(cur) out.push(cur);
-    return out;
-  }
-  const headerH = titleSize + 12 + headSize + 12;
-  let rowsH = 0;
-  rows.forEach(r=>{
-    const lines = textLines(r.desc, colDesc-6, bodySize).length || 1;
-    rowsH += Math.max(lineH, lines*lineH) + 6;
+// clique nos headers
+$$('.simHeader').forEach(h=>{
+  h.addEventListener('click', ()=>{
+    const acc = h.getAttribute('data-accordion');
+    toggleAccordion(acc);
   });
-  const footerH = 20;
-  const needed = margin + headerH + rowsH + footerH + margin;
-  const available = height;
-
-  if(mode==='ultima' && needed > available){
-    const scale = (available - 2*margin) / (needed - 2*margin);
-    titleSize *= scale;
-    headSize  *= scale;
-    bodySize  *= scale;
-    lineH     *= scale;
-  }
-
-  let y = height - margin;
-
-  page.drawText('Orçamento / Proposta Comercial', {
-    x: margin, y: y - titleSize, size: titleSize, font: helvB, color: rgb(0,0,0)
-  });
-  y -= (titleSize + 12);
-
-  function headerCell(txt, x){ page.drawText(txt, {x, y: y - headSize, size: headSize, font: helvB, color: rgb(0,0,0)}); }
-  headerCell('Nº', margin);
-  headerCell('Descrição do Produto', margin+colN);
-  headerCell('Preço', margin+colN+colDesc);
-  headerCell('Qt.', margin+colN+colDesc+colPreco);
-  headerCell('Total', margin+colN+colDesc+colPreco+colQt);
-  y -= (headSize + 6);
-  page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:1, color: rgb(0,0,0)});
-  y -= 6;
-
-  function drawRow(r){
-    const descLines = textLines(r.desc, colDesc-6, bodySize);
-    const rowHeight = Math.max(lineH, descLines.length*lineH);
-
-    if(mode==='nova' && (y - rowHeight) < margin + 60){
-      const newPage = pdfDoc.addPage([width, height]);
-      y = height - margin;
-      page = newPage;
-      page.drawText('Orçamento / Proposta Comercial (cont.)', {
-        x: margin, y: y - titleSize, size: titleSize, font: helvB, color: rgb(0,0,0)
-      });
-      y -= (titleSize + 12);
-      page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:1, color: rgb(0,0,0)});
-      y -= 6;
-    }
-
-    page.drawText(String(r.i).padStart(2,'0'), {x:margin, y: y - bodySize, size: bodySize, font: helv, color: rgb(0,0,0)});
-
-    let ly = y - bodySize;
-    descLines.forEach(line=>{
-      page.drawText(line, {x: margin+colN, y: ly, size: bodySize, font: helv, color: rgb(0,0,0)});
-      ly -= lineH;
-    });
-
-    function drawRight(text, xRight){
-      const w = helv.widthOfTextAtSize(text, bodySize);
-      page.drawText(text, {x: xRight - w, y: y - bodySize, size: bodySize, font: helv, color: rgb(0,0,0)});
-    }
-    drawRight(BRL(r.preco), margin+colN+colDesc+colPreco-6);
-    drawRight(String(r.qt),  margin+colN+colDesc+colPreco+colQt-6);
-    drawRight(BRL(r.total), width - margin - 6);
-
-    y -= rowHeight;
-    page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:.5, color: rgb(0,0,0)});
-  }
-
-  rows.forEach(drawRow);
-
-  y -= 14;
-  const label = 'Mensalidade: ' + BRL(mensal);
-  const wlab = helvB.widthOfTextAtSize(label, 12);
-  page.drawText(label, {x: width - margin - wlab, y: y - 12, size:12, font: helvB, color: rgb(0,0,0)});
-}
-
-/* Botão: gerar a partir de PDF */
-$('#btnGenerateFromPdf').addEventListener('click', async ()=>{
-  const file = $('#pdfBaseFile').files?.[0];
-  const mode = $('#pdfInsertMode').value;
-  const err = $('#pdfError'); err.style.display='none'; err.textContent='';
-  if(!file){ err.textContent='Selecione um PDF de proposta.'; err.style.display='block'; return; }
-
-  try{
-    let arrayBuf;
-    if (file.arrayBuffer) arrayBuf = await file.arrayBuffer();
-    else arrayBuf = await new Response(file).arrayBuffer();
-
-    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuf);
-    let page;
-
-    if(mode==='nova'){
-      page = pdfDoc.addPage();
-    }else{
-      const pages = pdfDoc.getPages();
-      page = pages[pages.length-1];
-    }
-
-    await drawOrcamentoOnPage(pdfDoc, page, mode);
-
-    const out = await pdfDoc.save();
-    const blob = new Blob([out], {type:'application/pdf'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href=url; a.download='proposta-camerite.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
-    $('#overlayPdf').classList.remove('show');
-  }catch(e){
-    err.textContent = 'Falha ao gerar PDF: ' + (e?.message||e);
-    err.style.display='block';
-  }
 });
 
-/* ===== Recalcular automaticamente quando o usuário digitar/alterar ===== */
-function bindAutoCompute(){
-  // Todos inputs/checkboxes/selects dentro das abas
-  $$('#tabs input, #tabs select').forEach(el=>{
-    const evt = (el.tagName==='SELECT' || el.type==='checkbox') ? 'change' : 'input';
-    el.addEventListener(evt, ()=>{ computeAll(); save(); });
-    // formata dinheiro ao sair do campo
-    if(el.getAttribute('inputmode')==='decimal'){
-      el.addEventListener('blur', ()=> setMoney2(el));
-    }
-  });
-}
+/* ===== Controles de meses ===== */
+$('#menosMes').addEventListener('click', ()=>{
+  let v = I('meses');
+  if(v>1){ $('#meses').value = v-1; computeAll(); save(); }
+});
+$('#maisMes').addEventListener('click', ()=>{
+  let v = I('meses');
+  if(v<60){ $('#meses').value = v+1; computeAll(); save(); }
+});
+$('#recalc').addEventListener('click', ()=>{
+  computeAll(); save();
+});
 
-/* ===== Principal ===== */
-function computeAll(){ const sim = buildSimulacao(); updateKPIs(sim); }
-function init(){ load(); bindAutoCompute(); computeAll(); }
-init();
+/* ===== Inicialização ===== */
+load();
+computeAll();
 
 /* ===== Supabase Auth ===== */
 (function(){
@@ -1159,33 +1216,45 @@ init();
   const authGate = document.getElementById('auth-gate-camerite');
   const form = document.getElementById('auth-form');
   const emailEl = document.getElementById('auth-email');
+  const passEl  = document.getElementById('auth-password');
   const errorEl = document.getElementById('auth-error');
 
-  const client = window.supabase.createClient(PROJECT_URL, ANON_KEY, { auth: { persistSession: true, storageKey: 'camerite-auth' } });
+  const client = window.supabase.createClient(PROJECT_URL, ANON_KEY, {
+    auth: { persistSession: true, storageKey: 'camerite-auth' }
+  });
   window.cameriteSupabase = client;
 
   function showGate(){ authGate.style.display = 'block'; }
   function hideGate(){ authGate.style.display = 'none'; }
 
   client.auth.getSession().then(({ data } )=> {
-    if (data && data.session) { localStorage.setItem('camerite_auth_ok','1'); hideGate(); }
-    else { showGate(); }
+    if (data && data.session) {
+      localStorage.setItem('camerite_auth_ok','1'); hideGate();
+    } else {
+      showGate();
+    }
   });
 
   client.auth.onAuthStateChange((_event, session)=>{
-    if (session) { localStorage.setItem('camerite_auth_ok','1'); hideGate(); }
-    else { localStorage.removeItem('camerite_auth_ok'); showGate(); }
+    if (session) {
+      localStorage.setItem('camerite_auth_ok','1'); hideGate();
+    } else {
+      localStorage.removeItem('camerite_auth_ok'); showGate();
+    }
   });
 
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
     errorEl.style.display = 'none';
     const email = emailEl.value.trim();
-    const password = document.getElementById('auth-password').value;
+    const password = passEl.value;
     const btn = document.getElementById('auth-submit');
     btn.disabled = true; btn.textContent = 'Entrando...';
     const { error } = await client.auth.signInWithPassword({ email, password });
-    if (error) { errorEl.textContent = error.message || 'Falha no login. Verifique suas credenciais.'; errorEl.style.display = 'block'; }
+    if (error) {
+      errorEl.textContent = error.message || 'Falha no login. Verifique suas credenciais.';
+      errorEl.style.display = 'block';
+    }
     btn.disabled = false; btn.textContent = 'Entrar';
   });
 
