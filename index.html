@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Camerite • Calculadora do Franqueado</title>
+<style>
+  :root{
+    --bg:#0f0b22;
+    --panel:#171235;
+    --panel-2:#140e2b;
+    --text:#F2EDFF;
+    --muted:#CFC7E8;
+    --muted-2:#a99fd1;
+    --brand:#7B48EA;
+    --brand-2:#5d31c9;
+    --brand-3:#D3C2F8;
+    --ink:#29184E;
+    --ok:#49e68a;
+    --bad:#ff8c8c;
+    --line: rgba(255,255,255,.12);
+    --line-strong: rgba(255,255,255,.32);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; padding:0; background:radial-gradient(1200px 600px at 20% -10%, #2b1b5d 0%, #120a24 42%, #0c0720 100%); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+
+  header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; padding:14px 16px;
+    background:linear-gradient(180deg, rgba(20,14,43,.92), rgba(20,14,43,.70));
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  header .brand{display:flex; align-items:center; gap:12px}
+  header .brand img{height:32px; width:auto; display:block}
+  .btn{
+    height:40px; padding:0 14px; border-radius:12px; border:1px solid transparent; cursor:pointer; font-weight:700;
+    background:linear-gradient(180deg, var(--brand), var(--brand-2)); color:#fff;
+    box-shadow: 0 6px 16px rgba(123,72,234,.25);
+  }
+  .btn.secondary{
+    background:#201745; color:#fff; border:1px solid var(--line-strong); box-shadow:none;
+  }
+  .btn.ghost{background:transparent; border:1px solid var(--line); color:var(--text)}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media (max-width:920px){ .row{grid-template-columns:1fr} }
+
+  .container{max-width:1200px; margin:18px auto; padding:0 16px}
+  .card{
+    background:linear-gradient(180deg, #1b1340, #140e2b);
+    border:1px solid var(--line);
+    border-radius:16px; padding:16px;
+    box-shadow: 0 10px 24px rgba(10,5,20,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  h2{margin:0 0 12px 0; font-size:18px}
+  h3{margin:0 0 10px 0; font-size:15px; color:var(--muted)}
+  label{display:grid; gap:6px; font-size:13px; color:var(--muted)}
+  input[type="number"], input[type="text"], input[type="email"], input[type="password"], select{
+    height:42px; padding:0 10px; border-radius:12px; border:1px solid var(--line); background:var(--panel-2); color:var(--text);
+  }
+  input[type="checkbox"]{transform:translateY(1px)}
+  .help{font-size:12px; color:var(--muted-2)}
+  .muted{color:var(--muted-2)}
+
+  /* Segmented control */
+  .seg{display:inline-flex; background:#1c1443; border:1px solid var(--line); border-radius:12px; padding:4px}
+  .seg button{
+    border:0; background:transparent; color:#DAD2FF; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700
+  }
+  .seg button.active{background:linear-gradient(180deg, #7B48EA,#5d31c9); color:#fff; box-shadow: 0 6px 18px rgba(123,72,234,.25)}
+
+  /* Abas (tabs) */
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 16px 0}
+  .tabs button{
+    height:36px; padding:0 12px; border-radius:10px; border:1px solid var(--line); background:#1a123c; color:#fff; cursor:pointer; font-weight:700
+  }
+  .tabs button.active{border-color:var(--brand-3); box-shadow: inset 0 0 0 1px var(--brand-3)}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* Selects com contraste forte */
+  .select-strong{
+    border:1px solid var(--brand-3) !important;
+    background:linear-gradient(180deg, #1a1238,#110a28);
+    box-shadow: inset 0 0 0 2px rgba(211,194,248,.14);
+    color:#fff;
+  }
+
+  /* KPIs */
+  .kpis{display:grid; gap:12px; grid-template-columns:repeat(6, 1fr)}
+  @media (max-width:1200px){ .kpis{grid-template-columns:repeat(3, 1fr)} }
+  @media (max-width:720px){ .kpis{grid-template-columns:repeat(2, 1fr)} }
+  .kpis .box{background:#1a1240; border:1px solid var(--line); border-radius:14px; padding:14px}
+  .kpis .name{font-size:12px; color:var(--muted)}
+  .kpis .val{font-size:18px; font-weight:800; margin-top:6px}
+
+  /* Tabelas */
+  table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px; border:1px solid var(--line)}
+  thead th{position:sticky; top:0; background:#1a1440; color:#eae6ff; font-weight:800; font-size:12px; text-align:left; padding:10px; border-bottom:1px solid var(--line); white-space:nowrap}
+  tbody td{padding:10px; border-bottom:1px solid var(--line); font-size:13px; white-space:nowrap}
+  .col-num{width:56px}
+  .col-preco{width:160px}
+  .col-qt{width:100px}
+  .col-total{width:180px; text-align:right}
+
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+
+  /* Overlays (modais) */
+  .overlay{
+    position:fixed; inset:0; display:none; place-items:center;
+    background:rgba(10,6,20,.8); backdrop-filter: blur(4px); z-index:1000;
+    color:var(--text);
+    color-scheme: dark; /* ajuda a forçar tema escuro nativo */
+  }
+  .overlay .dialog{
+    width:min(820px, 92vw); background:linear-gradient(180deg, #1e1648,#130c2a); border:1px solid var(--line-strong); border-radius:16px; padding:16px; box-shadow: 0 30px 50px rgba(0,0,0,.45);
+    color:var(--text);
+  }
+  .overlay .dialog h3{color:#fff}
+  .overlay .dialog .footer{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
+  .overlay.show{display:grid}
+
+  /* Inputs fortes dentro dos modais (contraste) */
+  .overlay .dialog input[type="text"],
+  .overlay .dialog input[type="email"],
+  .overlay .dialog input[type="password"],
+  .overlay .dialog input[type="file"],
+  .overlay .dialog select{
+    background:#1a1238; color:var(--text); border:1px solid var(--line-strong);
+  }
+  .overlay .dialog input[type="file"]{
+    padding:8px; height:auto; border-radius:10px;
+  }
+  .overlay .dialog input[type="file"]::file-selector-button{
+    margin-right:8px; padding:8px 12px; border:0; border-radius:8px; cursor:pointer; font-weight:700;
+    background:linear-gradient(180deg, var(--brand), var(--brand-2)); color:#fff;
+  }
+
+  /* === Correção extra de contraste do dropdown nativo === */
+  .overlay select,
+  .overlay option{
+    background-color:#1a1238 !important;
+    color:#F2EDFF !important;
+  }
+  .overlay select:focus,
+  .overlay option:focus,
+  .overlay option:hover{
+    background-color:#29184E !important;
+    color:#FFFFFF !important;
+  }
+  .overlay select::-ms-expand{ /* seta do IE/Edge antigo */
+    background-color:#1a1238;
+    color:#F2EDFF;
+  }
+
+  /* Printable orçamento */
+  #orcamentoPrint{display:none}
+  @media print{
+    body{background:#fff}
+    header, #top-fixed, #tabs, #overlayProdutoCustos, #overlayPdf, #dashboardBlock{display:none !important}
+    #orcamentoPrint{display:block}
+    #orcamentoPrint .container{max-width:none; padding:0}
+    #orcamentoPrint h2{color:#000}
+    #orcamentoPrint table{border-color:#000}
+    #orcamentoPrint thead th{background:#f2f2f2; color:#000; border-color:#000}
+    #orcamentoPrint tbody td{color:#000; border-color:#000}
+    #orcamentoPrint .grand{color:#000}
+  }
+ }
+
+  /* ===== CORREÇÃO DE CONTRASTE DOS SELECTS ===== */
+  select, option {
+    background-color: #1a1238 !important; /* fundo roxo escuro */
+    color: #F2EDFF !important;            /* texto lilás claro */
+  }
+  select:focus, option:focus, option:hover {
+    background-color: #29184E !important; /* roxo principal da marca */
+    color: #FFFFFF !important;             /* texto branco */
+  }
+  select::-ms-expand {
+    background-color: #1a1238;
+    color: #F2EDFF;
+  }
+
+  /* ===== COLAPSÁVEIS PARA A SEÇÃO 6 ===== */
+  details.collapse{
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#1a1440;
+    margin-top:12px;
+    overflow:hidden;
+  }
+  details.collapse > summary{
+    list-style:none;
+    cursor:pointer;
+    padding:12px 12px;
+    font-weight:800;
+    color:#fff;
+    background:#1a1440;
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:8px;
+  }
+  details.collapse > summary::-webkit-details-marker{display:none}
+  .chev{transition:transform .2s ease}
+  details[open] .chev{transform:rotate(90deg)}
+  .scroll-x{overflow-x:auto; width:100%}
+  .sticky-first th:first-child, .sticky-first td:first-child{
+    position:sticky; left:0; background:#1a1440; z-index:1;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="https://i.imgur.com/DZtsKz2.png" alt="Camerite" />
+  </div>
+  <div style="display:flex; gap:8px">
+    <button id="btnExportar" class="btn">Exportar PDF</button>
+    <button id="btnApagar" class="btn ghost">Apagar tudo</button>
+  </div>
+</header>
+
+<!-- 1) MODELO -->
+<div class="container" id="top-fixed">
+  <div class="card">
+    <h2>1) Modelo de Comercialização</h2>
+    <div class="seg" role="tablist" aria-label="Modelo">
+      <button id="modeloUsuario" class="active" aria-selected="true">Por Usuário</button>
+      <button id="modeloProduto" aria-selected="false">Por Produto</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div id="precoPorUsuario" style="display:block">
+        <label>Valor por Usuário (R$)
+          <input id="pvPorUsuario" type="text" inputmode="decimal" placeholder="0,00">
+        </label>
+      </div>
+      <div id="precosPorProduto" style="display:none">
+        <div class="row">
+          <label>Preço Armazenamento (R$ / unidade)
+            <input id="pvArmazenamento" type="text" inputmode="decimal" placeholder="0,00">
+          </label>
+          <label>Preço PMI (R$ / unidade)
+            <input id="pvPMI" type="text" inputmode="decimal" placeholder="0,00">
+          </label>
+          <label>Preço OCR (R$ / unidade)
+            <input id="pvOCR" type="text" inputmode="decimal" placeholder="0,00">
+          </label>
+          <label>Preço Toten (R$ / unidade)
+            <input id="pvToten" type="text" inputmode="decimal" placeholder="0,00">
+          </label>
+          <label>Preço Detecção Movimento (R$ / unidade)
+            <input id="pvDetMov" type="text" inputmode="decimal" placeholder="0,00">
+          </label>
+          <label>Preço Detecção Pessoas (R$ / unidade)
+            <input id="pvDetPes" type="text" inputmode="decimal" placeholder="0,00">
+          </label>
+        </div>
+        <div style="margin-top:8px">
+          <button id="btnCustosBase" class="btn secondary" type="button">Ver custos base (overlay)</button>
+          <div class="help">Mostra custos fixos usados no cálculo (Armazenamento e OCR).</div>
+        </div>
+      </div>
+      <div>
+        <label>Quantidade de Usuários
+          <input id="qtdUsuarios" type="number" min="0" step="1" placeholder="0">
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABAS (2 a 6) -->
+<div class="container card" id="tabs">
+  <div class="tabs" role="tablist" aria-label="Seções">
+    <button class="active" data-tab="t2">2) Produtos</button>
+    <button data-tab="t3">3) Custos Mensais Fixos</button>
+    <button data-tab="t4">4) Equipamento</button>
+    <button data-tab="t5">5) Custos de Implantação</button>
+    <button data-tab="t6">6) Simulação por Mês</button>
+  </div>
+
+  <!-- 2) PRODUTOS -->
+  <div class="tab-panel active" id="t2">
+    <div class="row">
+      <label>Armazenamento do Projeto (dias)
+        <select id="armazenamentoDias" class="select-strong">
+          <option value="1">1 dia (R$ 15,00)</option>
+          <option value="3">3 dias (R$ 19,00)</option>
+          <option value="7" selected>7 dias (R$ 27,00)</option>
+          <option value="30">30 dias (R$ 45,00)</option>
+        </select>
+      </label>
+
+      <div></div>
+
+      <label>Armazenamento (qtd)
+        <input id="qtdArmazenamento" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Combo PMI (qtd)
+        <input id="qtdPMI" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Combo OCR (qtd)
+        <input id="qtdOCR" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Toten de Monitoramento (qtd)
+        <input id="qtdToten" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Detecção de Movimento (qtd)
+        <input id="qtdDetMov" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Detecção de Pessoas (qtd)
+        <input id="qtdDetPes" type="number" min="0" step="1" placeholder="0">
+      </label>
+    </div>
+  </div>
+
+  <!-- 3) CUSTOS MENSAIS FIXOS -->
+  <div class="tab-panel" id="t3">
+    <div class="row">
+      <label>Royalties por Usuário (R$/mês)
+        <input id="royaltyPorUsuario" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <div></div>
+
+      <div class="row" style="grid-column:1/-1">
+        <div class="card" style="background:#1a1440">
+          <h3>Impostos</h3>
+          <div class="row">
+            <label>% Matriz
+              <input id="impMatriz" type="text" inputmode="decimal" placeholder="0,00">
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; margin-top:24px">
+              <input id="incluiMatriz" type="checkbox"> Incluir
+            </label>
+
+            <label>% Franqueado
+              <input id="impFranqueado" type="text" inputmode="decimal" placeholder="0,00">
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; margin-top:24px">
+              <input id="incluiFranqueado" type="checkbox"> Incluir
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <label>Internet — Qtd
+        <input id="fxQtdInternet" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Internet — Valor (R$)
+        <input id="fxValInternet" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+
+      <label>Energia — Qtd
+        <input id="fxQtdEnergia" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Energia — Valor (R$)
+        <input id="fxValEnergia" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+
+      <label>Fundo de Manutenção (R$/mês)
+        <input id="fxValFundo" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <div></div>
+
+      <label>Despesa Financeira — Qtd
+        <input id="fxQtdDespesaFin" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Despesa Financeira — Valor (R$)
+        <input id="fxValDespesaFin" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+    </div>
+  </div>
+
+  <!-- 4) EQUIPAMENTO -->
+  <div class="tab-panel" id="t4">
+    <div class="row">
+      <label>Câmera LPR — Valor (R$)
+        <input id="eqValLPR" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Câmera LPR — Tipo
+        <select id="eqTipoLPR" class="select-strong">
+          <option value="aquisicao">Aquisição (mês 0)</option>
+          <option value="locacao">Locação (mês ≥ 1)</option>
+        </select>
+      </label>
+
+      <label>PMI — Valor (R$)
+        <input id="eqValPMI" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>PMI — Tipo
+        <select id="eqTipoPMI" class="select-strong">
+          <option value="aquisicao">Aquisição (mês 0)</option>
+          <option value="locacao">Locação (mês ≥ 1)</option>
+        </select>
+      </label>
+
+      <label>Haste — Qtd
+        <input id="eqQtdHaste" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Haste — Valor (R$)
+        <input id="eqValHaste" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+
+      <label>Toten — Valor (R$)
+        <input id="eqValToten" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Poste/Caixa — Qtd
+        <input id="eqQtdPosteCaixa" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Poste/Caixa — Valor (R$)
+        <input id="eqValPosteCaixa" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+    </div>
+  </div>
+
+  <!-- 5) CUSTOS DE IMPLANTAÇÃO -->
+  <div class="tab-panel" id="t5">
+    <div class="row">
+      <label>Instalação Câmera (R$)
+        <input id="instValCam" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Instalação LPR (R$)
+        <input id="instValLPR" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Instalação Toten (R$)
+        <input id="instValToten" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Instalação Poste (R$)
+        <input id="instValPoste" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Frete (R$)
+        <input id="instValFrete" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Valor da Adesão (R$)
+        <input id="instValAdesao" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Deslocamento e Outros (R$)
+        <input id="instValDesloc" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Margem de Implantação (%)
+        <select id="instMargemPct" class="select-strong">
+          <option value="0">0%</option>
+          <option value="5">5%</option>
+          <option value="10">10%</option>
+          <option value="15" selected>15%</option>
+          <option value="20">20%</option>
+          <option value="30">30%</option>
+          <option value="40">40%</option>
+        </select>
+      </label>
+      <div class="card" style="grid-column:1/-1; background:#1a1440">
+        <h3>Valor de Implantação (soma + margem)</h3>
+        <div class="row">
+          <div>
+            <div class="help">Subtotal (Câm + LPR + Toten + Poste + Frete + Adesão + Desloc.)</div>
+            <div id="instSubtotal" style="font-weight:800; margin-top:6px">R$ 0,00</div>
+          </div>
+          <div>
+            <div class="help">Margem aplicada</div>
+            <div id="instMargemVal" style="font-weight:800; margin-top:6px">R$ 0,00</div>
+          </div>
+          <div>
+            <div class="help">Valor Final (receita no mês 0)</div>
+            <div id="instValorFinal" style="font-weight:900; font-size:18px; margin-top:6px">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6) SIMULAÇÃO POR MÊS (ATUALIZADA) -->
+  <div class="tab-panel" id="t6">
+    <div class="row">
+      <label>Meses para simular
+        <input id="meses" type="number" min="1" max="60" step="1" value="12">
+      </label>
+      <div style="display:flex; gap:8px; align-items:flex-end">
+        <button id="menosMes" class="btn secondary" type="button">− Meses</button>
+        <button id="maisMes" class="btn secondary" type="button">+ Meses</button>
+        <button id="recalc" class="btn" type="button">Recalcular</button>
+      </div>
+    </div>
+
+    <!-- Receitas (colapsável) -->
+    <details class="collapse" open>
+      <summary><span class="chev">▶</span> Receitas</summary>
+      <div class="scroll-x" style="padding:12px">
+        <table id="gridReceitas" class="sticky-first">
+          <thead><tr id="gridReceitasHead"></tr></thead>
+          <tbody id="gridReceitasBody"></tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- Despesas / Saldos (colapsável) -->
+    <details class="collapse" open style="margin-top:12px">
+      <summary><span class="chev">▶</span> Despesas</summary>
+      <div class="scroll-x" style="padding:12px">
+        <table id="gridSaldos" class="sticky-first">
+          <thead><tr id="gridSaldosHead"></tr></thead>
+          <tbody id="gridSaldosBody"></tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+</div>
+
+<!-- 7) DASHBOARD (final da página) -->
+<div class="container" id="dashboardBlock">
+  <div class="card" style="margin-top:16px">
+    <h2>7) Dashboard</h2>
+    <div class="kpis">
+      <div class="box"><div class="name">Valor do Contrato Anual</div><div class="val" id="kContratoAnual">R$ 0,00</div></div>
+      <div class="box"><div class="name">Receita Mensal</div><div class="val" id="kReceitaMes">R$ 0,00</div></div>
+      <div class="box"><div class="name">Custo Mensal (Franqueado)</div><div class="val" id="kCustoMes">R$ 0,00</div></div>
+      <div class="box"><div class="name">Imposto Mês</div><div class="val" id="kImpostoMes">R$ 0,00</div></div>
+      <div class="box"><div class="name">Custo do Franqueado Anual</div><div class="val" id="kCustoFranqueadoTotal">R$ 0,00</div></div>
+      <div class="box"><div class="name">Saldo Acumulado - 12 Meses</div><div class="val" id="kSaldoAcum12">R$ 0,00</div></div>
+      <div class="box"><div class="name">Rentabilidade</div><div class="val" id="kRentab">0%</div></div>
+      <div class="box"><div class="name">Mês de Equilíbrio</div><div class="val" id="kMesEquilibrio">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRINT (Orçamento) ===== -->
+<div id="orcamentoPrint">
+  <div class="container">
+    <h2>Orçamento / Proposta Comercial</h2>
+    <table id="tblOrc">
+      <thead>
+        <tr>
+          <th class="col-num">Nº</th>
+          <th>Descrição do Produto</th>
+          <th class="col-preco">Preço</th>
+          <th class="col-qt">Qt.</th>
+          <th class="col-total">Total</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="footer"><div class="grand" id="grandMensal">Mensalidade: R$ 0,00</div></div>
+  </div>
+</div>
+
+<!-- ===== Overlay: Custos Base ===== -->
+<div class="overlay" id="overlayProdutoCustos" role="dialog" aria-modal="true" aria-label="Custos base">
+  <div class="dialog">
+    <h3>Custos base utilizados no cálculo</h3>
+    <table>
+      <thead><tr><th>Item</th><th>Critério</th><th>Custo</th></tr></thead>
+      <tbody>
+        <tr><td>Armazenamento</td><td>1 dia</td><td>R$ 15,00</td></tr>
+        <tr><td>Armazenamento</td><td>3 dias</td><td>R$ 19,00</td></tr>
+        <tr><td>Armazenamento</td><td>7 dias</td><td>R$ 27,00</td></tr>
+        <tr><td>Armazenamento</td><td>30 dias</td><td>R$ 45,00</td></tr>
+        <tr><td>OCR</td><td>base 30 dias</td><td>R$ 45,00</td></tr>
+      </tbody>
+    </table>
+    <div class="help" style="margin-top:8px">Demais itens possuem preços definidos no formulário (por você).</div>
+    <div class="footer">
+      <button class="btn secondary" type="button" id="closeCustosBase">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Overlay: PDF ===== -->
+<div class="overlay" id="overlayPdf" role="dialog" aria-modal="true" aria-label="Exportar PDF">
+  <div class="dialog">
+    <h3>Exportar PDF</h3>
+    <div class="row">
+      <div class="card" style="background:#1a1440">
+        <h3>Gerar somente orçamento</h3>
+        <p class="help">Gera o PDF a partir do layout interno desta página.</p>
+        <button id="btnPrintOnly" class="btn" type="button">Gerar agora</button>
+      </div>
+      <div class="card" style="background:#1a1440">
+        <h3>Gerar a partir de proposta</h3>
+        <p class="help">Envie um PDF de proposta pronto e escolha se o orçamento entra em uma <b>nova folha</b> (padrão) ou <b>em cima da última folha</b>.</p>
+        <label>Selecionar PDF de proposta
+          <input id="pdfBaseFile" type="file" accept="application/pdf">
+        </label>
+        <label>Modo de inserção
+          <select id="pdfInsertMode" class="select-strong">
+            <option value="nova" selected>Gerar nova folha no final</option>
+            <option value="ultima">Gerar em cima da última folha</option>
+          </select>
+        </label>
+        <div style="display:flex; gap:8px; margin-top:10px">
+          <button id="btnGenerateFromPdf" class="btn" type="button">Gerar a partir do PDF</button>
+          <button id="btnClosePdf" class="btn secondary" type="button">Fechar</button>
+        </div>
+        <div id="pdfError" class="help" style="color:#ffb0b0; display:none; margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- === Auth (Supabase) === -->
+<div id="auth-gate-camerite" style="position:fixed; inset:0; display:none; place-items:center; background:rgba(9,5,20,.92); z-index:2000;">
+  <div style="width:min(420px,92vw); background:linear-gradient(180deg, #1e1648,#130c2a); border:1px solid var(--line-strong); border-radius:16px; padding:16px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+      <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(180deg, #7B48EA,#29184E); box-shadow:inset 0 0 0 2px rgba(255,255,255,.08)"></div>
+      <div>
+        <div style="font-weight:800; color:#F2EDFF; line-height:1.2">Camerite • Acesso</div>
+        <div style="font-size:12px; color:#CFC7E8">Área restrita: franqueados</div>
+      </div>
+    </div>
+    <form id="auth-form" style="display:grid; gap:12px;">
+      <label style="display:grid; gap:6px; color:#CFC7E8; font-size:13px;">
+        E-mail
+        <input id="auth-email" type="email" required autocomplete="username" style="height:44px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#140e2b; color:#F2EDFF; padding:0 12px;">
+      </label>
+      <label style="display:grid; gap:6px; color:#CFC7E8; font-size:13px;">
+        Senha
+        <input id="auth-password" type="password" required autocomplete="current-password" style="height:44px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#140e2b; color:#F2EDFF; padding:0 12px;">
+      </label>
+      <button id="auth-submit" type="submit" class="btn" style="height:48px;">Entrar</button>
+      <div id="auth-error" style="display:none; color:#ff8c8c; font-size:13px; line-height:1.3;"></div>
+      <div style="display:flex; justify-content:flex-start; align-items:center; margin-top:6px; color:#a99fd1; font-size:12px;">
+        <span>Protegido com Supabase Auth</span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Libs -->
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* ===== Helpers ===== */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const BRL = v => (isNaN(v)?0:v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const moneyToNum = s=>{
+  if(typeof s==='number') return s;
+  if(!s) return 0;
+  let x = String(s).replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3,})/g,'');
+  x = x.replace(',', '.');
+  const n = parseFloat(x);
+  return isNaN(n)?0:n;
+};
+const pctToNum = s=>{
+  if(typeof s==='number') return s;
+  if(!s) return 0;
+  const n = parseFloat(String(s).replace('%','').replace(',','.'));
+  return isNaN(n)?0:n;
+};
+const setMoney2 = (el)=>{ const n = moneyToNum(el.value); el.value = (isNaN(n)?0:n).toFixed(2).replace('.',','); };
+const storageKey='camerite_calc_v4';
+const I = id => parseInt($('#'+id)?.value||0);
+const M = id => moneyToNum($('#'+id)?.value||0);
+
+/* ===== Modelo ===== */
+function getModelo(){ return $('#modeloProduto').classList.contains('active') ? 'produto' : 'usuario'; }
+function setModelo(m){
+  $('#modeloUsuario').classList.toggle('active', m==='usuario');
+  $('#modeloProduto').classList.toggle('active', m==='produto');
+  $('#precosPorProduto').style.display = (m==='produto')?'block':'none';
+  $('#precoPorUsuario').style.display = (m==='usuario')?'block':'none';
+  computeAll(); save();
+}
+$('#modeloUsuario').addEventListener('click', ()=> setModelo('usuario'));
+$('#modeloProduto').addEventListener('click', ()=> setModelo('produto'));
+
+/* ===== Custos base ===== */
+const custoArmazenamentoMap = {1:15, 3:19, 7:27, 30:45};
+const custoOCR = 45;
+function custoArmSelecionado(){ const dias = parseInt($('#armazenamentoDias').value||7); return custoArmazenamentoMap[dias] || 27; }
+
+/* ===== Abas ===== */
+$$('.tabs button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    $$('.tabs button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const id=b.dataset.tab;
+    $$('.tab-panel').forEach(p=>p.classList.remove('active'));
+    $('#'+id).classList.add('active');
+  });
+});
+
+/* ===== Overlays ===== */
+$('#btnCustosBase')?.addEventListener('click', ()=> $('#overlayProdutoCustos').classList.add('show'));
+$('#closeCustosBase').addEventListener('click', ()=> $('#overlayProdutoCustos').classList.remove('show'));
+
+$('#btnExportar').addEventListener('click', ()=> $('#overlayPdf').classList.add('show'));
+$('#btnClosePdf').addEventListener('click', ()=> $('#overlayPdf').classList.remove('show'));
+$('#btnPrintOnly').addEventListener('click', ()=>{
+  $('#overlayPdf').classList.remove('show');
+  buildPrintable();
+  setTimeout(()=>window.print(), 10);
+});
+
+/* ===== Estado ===== */
+function collectState(){
+  const ids = [
+    'meses','armazenamentoDias',
+    'qtdArmazenamento','qtdPMI','qtdOCR','qtdToten','qtdDetMov','qtdDetPes','qtdUsuarios',
+    'pvArmazenamento','pvPMI','pvOCR','pvToten','pvDetMov','pvDetPes','pvPorUsuario',
+    'royaltyPorUsuario','impMatriz','incluiMatriz','impFranqueado','incluiFranqueado',
+    'fxQtdInternet','fxValInternet','fxQtdEnergia','fxValEnergia','fxValFundo','fxQtdDespesaFin','fxValDespesaFin',
+    'eqValLPR','eqTipoLPR','eqValPMI','eqTipoPMI','eqQtdHaste','eqValHaste','eqValToten','eqQtdPosteCaixa','eqValPosteCaixa',
+    'instValCam','instValLPR','instValToten','instValPoste','instValFrete','instValAdesao','instValDesloc','instMargemPct'
+  ];
+  const st = {};
+  ids.forEach(id=>{
+    const el = $('#'+id);
+    if(!el) return;
+    st[id] = (el.tagName==='SELECT' || el.type==='checkbox') ? (el.type==='checkbox'? el.checked : el.value) : el.value;
+  });
+  st.modelo = getModelo();
+  return st;
+}
+function save(){ localStorage.setItem(storageKey, JSON.stringify(collectState())); }
+function load(){
+  const obj = JSON.parse(localStorage.getItem(storageKey)||'{}');
+  Object.entries(obj).forEach(([k,v])=>{
+    const el = $('#'+k);
+    if(!el) return;
+    if(el.type==='checkbox'){ el.checked = !!v; }
+    else{ el.value = v; }
+  });
+  setModelo(obj.modelo||'usuario');
+}
+
+/* ===== Reset total ===== */
+function resetAll(){
+  localStorage.removeItem(storageKey);
+  $$('#tabs input[type="text"], #tabs input[type="number"]').forEach(el=> el.value = '');
+  $$('#tabs input[type="checkbox"]').forEach(el=> el.checked = false);
+
+  $('#meses').value = '12';
+  $('#armazenamentoDias').value = '7';
+  $('#instMargemPct').value = '15';
+  $('#eqTipoLPR').value = 'aquisicao';
+  $('#eqTipoPMI').value = 'aquisicao';
+  $('#pdfInsertMode').value = 'nova';
+  setModelo('usuario');
+
+  $('#overlayProdutoCustos').classList.remove('show');
+  $('#overlayPdf').classList.remove('show');
+
+  computeAll();
+  save();
+}
+$('#btnApagar').addEventListener('click', resetAll);
+
+/* ===== Botões de meses (aba 6) ===== */
+function clampMeses(n){ return Math.max(1, Math.min(60, n|0)); }
+$('#maisMes').addEventListener('click', ()=>{
+  $('#meses').value = clampMeses(I('meses') + 1);
+  computeAll(); save();
+});
+$('#menosMes').addEventListener('click', ()=>{
+  $('#meses').value = clampMeses(I('meses') - 1);
+  computeAll(); save();
+});
+$('#recalc').addEventListener('click', ()=>{ computeAll(); save(); });
+
+/* ====== Cálculos ====== */
+function receitaMensalBase(){
+  const m = getModelo();
+  if(m==='usuario'){
+    return I('qtdUsuarios') * M('pvPorUsuario');
+  }else{
+    return I('qtdArmazenamento')*M('pvArmazenamento')
+         + I('qtdPMI')*M('pvPMI')
+         + I('qtdOCR')*M('pvOCR')
+         + I('qtdToten')*M('pvToten')
+         + I('qtdDetMov')*M('pvDetMov')
+         + I('qtdDetPes')*M('pvDetPes');
+  }
+}
+function calcImplantacao(){
+  const subtotal = M('instValCam') + M('instValLPR') + M('instValToten') + M('instValPoste') + M('instValFrete') + M('instValAdesao') + M('instValDesloc');
+  const margemPct = pctToNum($('#instMargemPct').value);
+  const margemVal = subtotal * (margemPct/100);
+  const total = subtotal + margemVal;
+  $('#instSubtotal').textContent = BRL(subtotal);
+  $('#instMargemVal').textContent = BRL(margemVal);
+  $('#instValorFinal').textContent = BRL(total);
+  return {subtotal, margemVal, total};
+}
+function calcDespesaArmazenamento(){
+  const qtdBase = I('qtdToten')*4 + I('qtdArmazenamento') + I('qtdPMI');
+  const r1 = qtdBase * custoArmSelecionado();
+  const r2 = I('qtdOCR') * custoOCR;
+  return r1 + r2;
+}
+function calcDespesaCameraPMI(m){
+  const qtdBase = I('qtdToten')*4 + I('qtdPMI');
+  const val = M('eqValPMI') * qtdBase;
+  const tipo = $('#eqTipoPMI').value || 'aquisicao';
+  if(tipo==='aquisicao'){ return m===0 ? val : 0; }
+  return m>=1 ? val : 0;
+}
+function fixosMensais(){
+  const internet = I('fxQtdInternet') * M('fxValInternet');
+  const energia  = I('fxQtdEnergia') * M('fxValEnergia');
+  const fundo    = M('fxValFundo');
+  const despFin  = I('fxQtdDespesaFin') * M('fxValDespesaFin');
+  const roy      = I('qtdUsuarios') * M('royaltyPorUsuario');
+  return {internet, energia, fundo, despFin, roy};
+}
+function impostosDoMes(receita, custosSemImp){
+  let impM = 0, impF = 0;
+  if($('#incluiMatriz').checked){ impM = receita * (pctToNum($('#impMatriz').value)/100); }
+  if($('#incluiFranqueado').checked){
+    const base = Math.max(0, receita - custosSemImp - impM);
+    impF = base * (pctToNum($('#impFranqueado').value)/100);
+  }
+  return {impM, impF, total: impM + impF};
+}
+
+/* ===== Tabelas em grade (item x mês) — seção 6 ===== */
+function receitasItensPorMes(meses){
+  const modelo = getModelo();
+  const itens = [];
+
+  if(modelo === 'usuario'){
+    const base = I('qtdUsuarios') * M('pvPorUsuario');
+    itens.push({nome:'Plano por Usuário', serie: Array.from({length:meses+1}, (_,m)=> m===0?0:base)});
+  } else {
+    const defs = [
+      {nome:'Armazenamento', qt:I('qtdArmazenamento'), preco:M('pvArmazenamento')},
+      {nome:'Combo PMI',     qt:I('qtdPMI'),          preco:M('pvPMI')},
+      {nome:'Combo OCR',     qt:I('qtdOCR'),          preco:M('pvOCR')},
+      {nome:'Toten',         qt:I('qtdToten'),        preco:M('pvToten')},
+      {nome:'Det. Movimento',qt:I('qtdDetMov'),       preco:M('pvDetMov')},
+      {nome:'Det. Pessoas',  qt:I('qtdDetPes'),       preco:M('pvDetPes')},
+    ];
+    defs.forEach(d=>{
+      const v = (d.qt||0) * (d.preco||0);
+      itens.push({nome:d.nome, serie:Array.from({length:meses+1}, (_,m)=> m===0?0:v)});
+    });
+  }
+
+  const total = Array.from({length:meses+1}, (_,m)=>{
+    return itens.reduce((acc,it)=> acc + (it.serie[m]||0), 0);
+  });
+
+  return {itens, total};
+}
+
+function renderGridReceitas(meses){
+  const head = $('#gridReceitasHead');
+  const body = $('#gridReceitasBody');
+  head.innerHTML=''; body.innerHTML='';
+
+  head.insertAdjacentHTML('beforeend', `<th>Item \\ Mês</th>`);
+  for(let m=0;m<=meses;m++){
+    head.insertAdjacentHTML('beforeend', `<th>${m}</th>`);
+  }
+
+  const {itens, total} = receitasItensPorMes(meses);
+  itens.forEach(it=>{
+    let row = `<tr><td>${it.nome}</td>`;
+    for(let m=0;m<=meses;m++){ row += `<td>${BRL(it.serie[m]||0)}</td>`; }
+    row += `</tr>`;
+    body.insertAdjacentHTML('beforeend', row);
+  });
+
+  let totRow = `<tr><td style="font-weight:800">Receita Total</td>`;
+  for(let m=0;m<=meses;m++){ totRow += `<td style="font-weight:800">${BRL(total[m]||0)}</td>`; }
+  totRow += `</tr>`;
+  body.insertAdjacentHTML('beforeend', totRow);
+}
+
+function renderGridSaldos(meses, saldoMes, saldoAc){
+  const head = $('#gridSaldosHead');
+  const body = $('#gridSaldosBody');
+  head.innerHTML=''; body.innerHTML='';
+
+  head.insertAdjacentHTML('beforeend', `<th>Item \\ Mês</th>`);
+  for(let m=0;m<=meses;m++){
+    head.insertAdjacentHTML('beforeend', `<th>${m}</th>`);
+  }
+
+  let rowMes = `<tr><td>Saldo do Mês</td>`;
+  for(let m=0;m<=meses;m++){
+    const v = saldoMes[m]||0;
+    rowMes += `<td class="${v>=0?'ok':'bad'}">${BRL(v)}</td>`;
+  }
+  rowMes += `</tr>`;
+  body.insertAdjacentHTML('beforeend', rowMes);
+
+  let rowAc = `<tr><td>Saldo Acumulado</td>`;
+  for(let m=0;m<=meses;m++){
+    const v = saldoAc[m]||0;
+    rowAc += `<td class="${v>=0?'ok':'bad'}">${BRL(v)}</td>`;
+  }
+  rowAc += `</tr>`;
+  body.insertAdjacentHTML('beforeend', rowAc);
+}
+
+/* ===== Simulação e KPIs ===== */
+function buildSimulacao(){
+  const meses = I('meses');
+  const recMes = []; const despMes = []; const impMes = []; const saldoMes = []; const saldoAc = [];
+  const implant = calcImplantacao().total;
+
+  for(let m=0;m<=meses;m++){
+    let rec = 0;
+    if(m===0 && implant>0){ rec += implant; }
+    if(m>=1){ rec += receitaMensalBase(); }
+
+    let desp = 0;
+    if(m>=1){
+      const arm = calcDespesaArmazenamento(); desp+=arm;
+      const fix = fixosMensais();
+      desp+=fix.internet + fix.energia + fix.fundo + fix.roy + fix.despFin;
+    }
+    desp += calcDespesaCameraPMI(m);
+
+    const imp = impostosDoMes(rec, desp);
+    const totalDespesas = desp + imp.total;
+
+    const saldo = rec - totalDespesas;
+    saldoMes.push(saldo);
+    saldoAc.push((saldoAc[m-1]||0) + saldo);
+
+    recMes.push(rec);
+    despMes.push(totalDespesas);
+    impMes.push(imp.total);
+  }
+
+  renderGridReceitas(meses);
+  renderGridSaldos(meses, saldoMes, saldoAc);
+
+  return {recMes, despMes, impMes, saldoMes, saldoAc, implantacao: implant};
+}
+function updateKPIs(sim){
+  const m1Rec = sim.recMes[1]||0;
+  const m1Desp= sim.despMes[1]||0;
+  const m1Imp = sim.impMes[1]||0;
+
+  let somaReceitas12 = 0; for(let i=1;i<=Math.min(12, sim.recMes.length-1);i++) somaReceitas12 += sim.recMes[i];
+  const contratoAnual = somaReceitas12 + (sim.implantacao||0);
+
+  let somaDespesas12 = 0; for(let i=1;i<=Math.min(12, sim.despMes.length-1);i++) somaDespesas12 += sim.despMes[i];
+
+  let acum12 = 0; for(let i=0;i<=Math.min(12, sim.saldoMes.length-1);i++) acum12 += sim.saldoMes[i];
+
+  let mesEq = '—'; for(let i=0;i<sim.saldoAc.length;i++){ if(sim.saldoAc[i]>0){ mesEq = 'Mês '+String(i).padStart(2,'0'); break; } }
+
+  $('#kContratoAnual').textContent = BRL(contratoAnual);
+  $('#kReceitaMes').textContent   = BRL(m1Rec);
+  $('#kCustoMes').textContent     = BRL(m1Desp - m1Imp);
+  $('#kImpostoMes').textContent   = BRL(m1Imp);
+  $('#kCustoFranqueadoTotal').textContent = BRL(somaDespesas12);
+  $('#kSaldoAcum12').textContent  = BRL(acum12);
+  const rent = contratoAnual>0 ? (acum12/contratoAnual*100) : 0;
+  $('#kRentab').textContent = (rent).toFixed(1).replace('.',',')+'%';
+  $('#kMesEquilibrio').textContent = mesEq;
+}
+function buildPrintable(){
+  const tbody = $('#tblOrc tbody'); tbody.innerHTML='';
+  const {rows, mensal} = buildBudgetRows();
+  rows.forEach(r=>{
+    tbody.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(r.i).padStart(2,'0')}</td><td>${r.desc}</td><td class="col-preco">${BRL(r.preco)}</td><td class="col-qt">${r.qt}</td><td class="col-total">${BRL(r.total)}</td></tr>`);
+  });
+  $('#grandMensal').textContent = 'Mensalidade: ' + BRL(mensal);
+}
+
+/* ===== Monta linhas do orçamento (para DOM e PDF) ===== */
+function buildBudgetRows(){
+  const rows = [];
+  let i=1, mensal=0;
+  const modelo = getModelo();
+  function add(desc, preco, qt){
+    if(qt>0 && preco>0){
+      const total = preco*qt; mensal += total;
+      rows.push({ i:i++, desc, preco, qt, total });
+    }
+  }
+  if(modelo==='usuario'){
+    add('Plano por Usuário', M('pvPorUsuario'), I('qtdUsuarios'));
+  }else{
+    add('Armazenamento', M('pvArmazenamento'), I('qtdArmazenamento'));
+    add('PMI',            M('pvPMI'),           I('qtdPMI'));
+    add('OCR',            M('pvOCR'),           I('qtdOCR'));
+    add('Toten',          M('pvToten'),         I('qtdToten'));
+    add('Detecção Movimento', M('pvDetMov'),    I('qtdDetMov'));
+    add('Detecção Pessoas',   M('pvDetPes'),    I('qtdDetPes'));
+  }
+  return {rows, mensal};
+}
+
+/* ===== PDF: desenha orçamento na página ===== */
+async function drawOrcamentoOnPage(pdfDoc, page, mode){
+  const { rows, mensal } = buildBudgetRows();
+  const { width, height } = page.getSize();
+
+  let margin = 40;
+  let colN = 28, colPreco = 90, colQt = 36, colTotal = 110;
+  let colDesc = width - 2*margin - colN - colPreco - colQt - colTotal;
+
+  let titleSize = 18;
+  let headSize = 11;
+  let bodySize = 10;
+  let lineH = 18;
+
+  const rgb = PDFLib.rgb;
+  const helv = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+  const helvB = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+  function textLines(text, maxW, size){
+    const words = String(text).split(' ');
+    const out=[]; let cur='';
+    words.forEach(w=>{
+      const test=(cur?cur+' ':'')+w;
+      if(helv.widthOfTextAtSize(test, size) <= maxW) cur=test;
+      else{ if(cur) out.push(cur); cur=w; }
+    });
+    if(cur) out.push(cur);
+    return out;
+  }
+  const headerH = titleSize + 12 + headSize + 12;
+  let rowsH = 0;
+  rows.forEach(r=>{
+    const lines = textLines(r.desc, colDesc-6, bodySize).length || 1;
+    rowsH += Math.max(lineH, lines*lineH) + 6;
+  });
+  const footerH = 20;
+  const needed = margin + headerH + rowsH + footerH + margin;
+  const available = height;
+
+  if(mode==='ultima' && needed > available){
+    const scale = (available - 2*margin) / (needed - 2*margin);
+    titleSize *= scale;
+    headSize  *= scale;
+    bodySize  *= scale;
+    lineH     *= scale;
+  }
+
+  let y = height - margin;
+
+  page.drawText('Orçamento / Proposta Comercial', {
+    x: margin, y: y - titleSize, size: titleSize, font: helvB, color: rgb(0,0,0)
+  });
+  y -= (titleSize + 12);
+
+  function headerCell(txt, x){ page.drawText(txt, {x, y: y - headSize, size: headSize, font: helvB, color: rgb(0,0,0)}); }
+  headerCell('Nº', margin);
+  headerCell('Descrição do Produto', margin+colN);
+  headerCell('Preço', margin+colN+colDesc);
+  headerCell('Qt.', margin+colN+colDesc+colPreco);
+  headerCell('Total', margin+colN+colDesc+colPreco+colQt);
+  y -= (headSize + 6);
+  page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:1, color: rgb(0,0,0)});
+  y -= 6;
+
+  function drawRow(r){
+    const descLines = textLines(r.desc, colDesc-6, bodySize);
+    const rowHeight = Math.max(lineH, descLines.length*lineH);
+
+    if(mode==='nova' && (y - rowHeight) < margin + 60){
+      const newPage = pdfDoc.addPage([width, height]);
+      y = height - margin;
+      page = newPage;
+      page.drawText('Orçamento / Proposta Comercial (cont.)', {
+        x: margin, y: y - titleSize, size: titleSize, font: helvB, color: rgb(0,0,0)
+      });
+      y -= (titleSize + 12);
+      page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:1, color: rgb(0,0,0)});
+      y -= 6;
+    }
+
+    page.drawText(String(r.i).padStart(2,'0'), {x:margin, y: y - bodySize, size: bodySize, font: helv, color: rgb(0,0,0)});
+
+    let ly = y - bodySize;
+    descLines.forEach(line=>{
+      page.drawText(line, {x: margin+colN, y: ly, size: bodySize, font: helv, color: rgb(0,0,0)});
+      ly -= lineH;
+    });
+
+    function drawRight(text, xRight){
+      const w = helv.widthOfTextAtSize(text, bodySize);
+      page.drawText(text, {x: xRight - w, y: y - bodySize, size: bodySize, font: helv, color: rgb(0,0,0)});
+    }
+    drawRight(BRL(r.preco), margin+colN+colDesc+colPreco-6);
+    drawRight(String(r.qt),  margin+colN+colDesc+colPreco+colQt-6);
+    drawRight(BRL(r.total), width - margin - 6);
+
+    y -= rowHeight;
+    page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:.5, color: rgb(0,0,0)});
+  }
+
+  rows.forEach(drawRow);
+
+  y -= 14;
+  const label = 'Mensalidade: ' + BRL(mensal);
+  const wlab = helvB.widthOfTextAtSize(label, 12);
+  page.drawText(label, {x: width - margin - wlab, y: y - 12, size:12, font: helvB, color: rgb(0,0,0)});
+}
+
+/* Botão: gerar a partir de PDF */
+$('#btnGenerateFromPdf').addEventListener('click', async ()=>{
+  const file = $('#pdfBaseFile').files?.[0];
+  const mode = $('#pdfInsertMode').value;
+  const err = $('#pdfError'); err.style.display='none'; err.textContent='';
+  if(!file){ err.textContent='Selecione um PDF de proposta.'; err.style.display='block'; return; }
+
+  try{
+    let arrayBuf;
+    if (file.arrayBuffer) arrayBuf = await file.arrayBuffer();
+    else arrayBuf = await new Response(file).arrayBuffer();
+
+    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuf);
+    let page;
+
+    if(mode==='nova'){
+      page = pdfDoc.addPage();
+    }else{
+      const pages = pdfDoc.getPages();
+      page = pages[pages.length-1];
+    }
+
+    await drawOrcamentoOnPage(pdfDoc, page, mode);
+
+    const out = await pdfDoc.save();
+    const blob = new Blob([out], {type:'application/pdf'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download='proposta-camerite.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+    $('#overlayPdf').classList.remove('show');
+  }catch(e){
+    err.textContent = 'Falha ao gerar PDF: ' + (e?.message||e);
+    err.style.display='block';
+  }
+});
+
+/* ===== Recalcular automaticamente quando o usuário digitar/alterar ===== */
+function bindAutoCompute(){
+  // Todos inputs/checkboxes/selects dentro das abas
+  $$('#tabs input, #tabs select').forEach(el=>{
+    const evt = (el.tagName==='SELECT' || el.type==='checkbox') ? 'change' : 'input';
+    el.addEventListener(evt, ()=>{ computeAll(); save(); });
+    // formata dinheiro ao sair do campo
+    if(el.getAttribute('inputmode')==='decimal'){
+      el.addEventListener('blur', ()=> setMoney2(el));
+    }
+  });
+}
+
+/* ===== Principal ===== */
+function computeAll(){ const sim = buildSimulacao(); updateKPIs(sim); }
+function init(){ load(); bindAutoCompute(); computeAll(); }
+init();
+
+/* ===== Supabase Auth ===== */
+(function(){
+  const PROJECT_URL = "https://osqzsennjsmopxjdxlss.supabase.co";
+  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXpzZW5uanNtb3B4amR4bHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjcyMjQsImV4cCI6MjA3NjgwMzIyNH0.nZKK-oHhZiZz8AA5x3EQYyGt8O5gvjfj_mWazniMOpU";
+  const authGate = document.getElementById('auth-gate-camerite');
+  const form = document.getElementById('auth-form');
+  const emailEl = document.getElementById('auth-email');
+  const errorEl = document.getElementById('auth-error');
+
+  const client = window.supabase.createClient(PROJECT_URL, ANON_KEY, { auth: { persistSession: true, storageKey: 'camerite-auth' } });
+  window.cameriteSupabase = client;
+
+  function showGate(){ authGate.style.display = 'block'; }
+  function hideGate(){ authGate.style.display = 'none'; }
+
+  client.auth.getSession().then(({ data } )=> {
+    if (data && data.session) { localStorage.setItem('camerite_auth_ok','1'); hideGate(); }
+    else { showGate(); }
+  });
+
+  client.auth.onAuthStateChange((_event, session)=>{
+    if (session) { localStorage.setItem('camerite_auth_ok','1'); hideGate(); }
+    else { localStorage.removeItem('camerite_auth_ok'); showGate(); }
+  });
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    errorEl.style.display = 'none';
+    const email = emailEl.value.trim();
+    const password = document.getElementById('auth-password').value;
+    const btn = document.getElementById('auth-submit');
+    btn.disabled = true; btn.textContent = 'Entrando...';
+    const { error } = await client.auth.signInWithPassword({ email, password });
+    if (error) { errorEl.textContent = error.message || 'Falha no login. Verifique suas credenciais.'; errorEl.style.display = 'block'; }
+    btn.disabled = false; btn.textContent = 'Entrar';
+  });
+
+  window.cameriteLogout = async function() {
+    await client.auth.signOut();
+    localStorage.removeItem('camerite_auth_ok');
+    showGate();
+  };
+})();
+</script>
+
+</body>
+</html>
