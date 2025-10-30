@@ -233,22 +233,22 @@
       <div id="precosPorProduto" style="display:none">
         <div class="row">
           <label>Preço Armazenamento
-            <input id="pvArmazenamento" type="text" inputmode="decimal" placeholder="0,00">
+            <input id="pvArmazenamento" type="text" inputmode="decimal" placeholder="R$ 0,00">
           </label>
           <label>Preço PMI
-            <input id="pvPMI" type="text" inputmode="decimal" placeholder="0,00">
+            <input id="pvPMI" type="text" inputmode="decimal" placeholder="R$ 0,00">
           </label>
           <label>Preço LPR
-            <input id="pvLPR" type="text" inputmode="decimal" placeholder="0,00">
+            <input id="pvLPR" type="text" inputmode="decimal" placeholder="R$ 0,00">
           </label>
           <label>Preço Toten
-            <input id="pvToten" type="text" inputmode="decimal" placeholder="0,00">
+            <input id="pvToten" type="text" inputmode="decimal" placeholder="R$ 0,00">
           </label>
           <label>Preço Detecção Movimento
-            <input id="pvDetMov" type="text" inputmode="decimal" placeholder="0,00">
+            <input id="pvDetMov" type="text" inputmode="decimal" placeholder="R$ 0,00">
           </label>
           <label>Preço Detecção Pessoas
-            <input id="pvDetPes" type="text" inputmode="decimal" placeholder="0,00">
+            <input id="pvDetPes" type="text" inputmode="decimal" placeholder="R$ 0,00">
           </label>
         </div>
         <div style="margin-top:8px">
@@ -323,14 +323,14 @@
           <h3>Impostos</h3>
           <div class="row">
             <label>% Matriz
-              <input id="impMatriz" type="text" inputmode="decimal" placeholder="0,00">
+              <input id="impMatriz" type="text" inputmode="decimal" placeholder="0,00%">
             </label>
             <label style="display:flex; align-items:center; gap:8px; margin-top:24px">
               <input id="incluiMatriz" type="checkbox"> Incluir
             </label>
 
             <label>% Franqueado
-              <input id="impFranqueado" type="text" inputmode="decimal" placeholder="0,00">
+              <input id="impFranqueado" type="text" inputmode="decimal" placeholder="0,00%">
             </label>
             <label style="display:flex; align-items:center; gap:8px; margin-top:24px">
               <input id="incluiFranqueado" type="checkbox"> Incluir
@@ -660,7 +660,34 @@ const pctToNum = s=>{
   const n = parseFloat(String(s).replace('%','').replace(',','.'));
   return isNaN(n)?0:n;
 };
-const setMoney2 = (el)=>{ const n = moneyToNum(el.value); el.value = (isNaN(n)?0:n).toFixed(2).replace('.',','); };
+// === Máscara dinâmica com "R$" fixo ao digitar (moeda) ===
+function formatMoneyLive(el) {
+  let val = el.value.replace(/\D/g, '');
+  if (val === '') { el.value = 'R$ '; return; }
+  val = (parseInt(val, 10) / 100).toFixed(2);
+  el.value = 'R$ ' + val.replace('.', ',');
+}
+// Formata moeda ao sair do campo/mudar
+const setMoney2 = (el) => {
+  const n = moneyToNum(el.value);
+  const val = isNaN(n) ? 0 : n;
+  el.value = 'R$ ' + val.toFixed(2).replace('.', ',');
+};
+
+// === Máscara dinâmica de percentual (sem "R$") ===
+function formatPercentLive(el){
+  let val = el.value.replace(/\D/g, ''); // só dígitos
+  if (val === '') { el.value = '0,00%'; return; }
+  val = (parseInt(val, 10) / 100).toFixed(2).replace('.', ',');
+  el.value = val + '%';
+}
+
+// Formata porcentagem ao sair do campo/mudar
+function setPercent(el){
+  const n = pctToNum(el.value);     // entende "10,15%" → 10.15
+  const val = isNaN(n) ? 0 : n;
+  el.value = val.toFixed(2).replace('.', ',') + '%';
+}
 const storageKey='camerite_calc_v4';
 const I = id => parseInt($('#'+id)?.value||0);
 const M = id => moneyToNum($('#'+id)?.value||0);
@@ -738,21 +765,10 @@ function load(){
 
 /* ===== Reset total ===== */
 function resetAll(){
-  localStorage.removeItem(storageKey);
-  $$('#tabs input[type="text"], #tabs input[type="number"]').forEach(el=> el.value = '');
-  $$('#tabs input[type="checkbox"]').forEach(el=> el.checked = false);
-  $('#meses').value = '12';
-  $('#armazenamentoDias').value = '7';
-  $('#instMargemPct').value = '15';
-  $('#eqTipoLPR').value = 'aquisicao';
-  $('#eqTipoPMI').value = 'aquisicao';
-  $('#pdfInsertMode').value = 'nova';
-  setModelo('usuario');
-  showRecDetails = true; showDespDetails = true; updateToggleButtons();
-  $('#overlayProdutoCustos').classList.remove('show');
-  $('#overlayPdf').classList.remove('show');
-  computeAll();
-  save();
+  try { localStorage.removeItem(storageKey); } catch(e){}
+  // Se quiser garantir, pode limpar tudo do localStorage:
+  // try { localStorage.clear(); } catch(e){}
+  window.location.reload(); // garante que TODOS os campos voltem ao estado inicial
 }
 $('#btnApagar').addEventListener('click', resetAll);
 
@@ -1150,17 +1166,60 @@ document.getElementById('auth-form')?.addEventListener('submit', async (e)=>{
 });
 
 /* ===== Inicialização ===== */
+/* ===== Inicialização ===== */
 function computeAll(){
   buildSimulacao();
 }
+
+// CHANGE: formata ao sair do campo (moeda x %)
 $$('input, select').forEach(el=>{
   el.addEventListener('change', ()=>{
-    if(el.type==='text' && el.inputMode==='decimal') setMoney2(el);
-    computeAll(); save();
+    if (el.type === 'text' && el.inputMode === 'decimal') {
+      if (el.id === 'impMatriz' || el.id === 'impFranqueado') {
+        setPercent(el);   // % só nos dois de impostos
+      } else {
+        setMoney2(el);    // R$ nos demais
+      }
+    }
+    computeAll(); 
+    save();
   });
 });
+
+// INPUT: máscara enquanto digita, diferenciando por id
+$$('input[type="text"][inputmode="decimal"]').forEach(el=>{
+  if (el.id === 'impMatriz' || el.id === 'impFranqueado') {
+    // Percentual
+    if (!el.value) el.value = '0,00%';
+    el.placeholder = '0,00%';
+    el.addEventListener('input', ()=> formatPercentLive(el));
+    el.addEventListener('blur',  ()=> setPercent(el));
+  } else {
+    // Moeda
+    if (!el.value) el.value = 'R$ ';
+    el.addEventListener('input', ()=> formatMoneyLive(el));
+    // protege o prefixo "R$ "
+    el.addEventListener('keydown', (e)=>{
+      if ((e.key === 'Backspace' || e.key === 'Delete') && el.selectionStart <= 3) {
+        e.preventDefault();
+        el.setSelectionRange(3,3);
+      }
+    });
+  }
+});
+
+// LOAD: aplica a formatação correta para cada tipo logo após carregar do storage
 window.addEventListener('load', ()=>{
   load();
+
+  $$('input[type="text"][inputmode="decimal"]').forEach(el=>{
+    if (el.id === 'impMatriz' || el.id === 'impFranqueado') {
+      setPercent(el);   // ex.: 10,15%
+    } else {
+      setMoney2(el);    // ex.: R$ 39,90
+    }
+  });
+
   computeAll();
 });
 </script>
