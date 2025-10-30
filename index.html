@@ -104,46 +104,41 @@
   .col-qt{width:100px}
   .col-total{width:180px; text-align:right}
 
-  /* Tabelas com scroll horizontal */
-  .table-scroll-wrapper{
-    overflow-x:auto;
-    border:1px solid var(--line);
+  /* Tabelas horizontais (meses em colunas) */
+  .table-wrapper{
+    overflow-x: auto;
     border-radius:12px;
-  }
-  .table-scroll-wrapper table{
-    border:none;
-    min-width:100%;
+    border:1px solid var(--line);
   }
   .table-horizontal{
     width:auto;
     min-width:100%;
+    border:none;
   }
   .table-horizontal thead th{
+    min-width:100px;
     text-align:center;
-    min-width:90px;
     white-space:nowrap;
   }
   .table-horizontal thead th:first-child{
-    text-align:left;
     min-width:180px;
+    text-align:left;
     position:sticky;
     left:0;
     background:#1a1440;
-    z-index:10;
+    z-index:2;
   }
   .table-horizontal tbody td{
     text-align:center;
-    min-width:90px;
     white-space:nowrap;
   }
   .table-horizontal tbody td:first-child{
     text-align:left;
-    min-width:180px;
+    font-weight:600;
     position:sticky;
     left:0;
     background:#140e2b;
-    z-index:5;
-    font-weight:600;
+    z-index:1;
   }
   .table-horizontal tbody tr:last-child td{
     font-weight:800;
@@ -517,38 +512,46 @@
         <input id="meses" type="number" min="1" max="60" step="1" value="12">
       </label>
       <div style="display:flex; gap:8px; align-items:flex-end">
-        <button id="menosMes" class="btn secondary" type="button">– Meses</button>
+        <button id="menosMes" class="btn secondary" type="button">− Meses</button>
         <button id="maisMes" class="btn secondary" type="button">+ Meses</button>
         <button id="recalc" class="btn" type="button">Recalcular</button>
       </div>
     </div>
 
-    <div style="margin-top:16px">
+    <div class="row" style="margin-top:16px">
+      <div class="card" style="background:#1a1440">
+        <div class="card-head">
+          <h3>Receitas</h3>
+          <button id="toggleRec" class="btn small secondary" type="button">Ocultar detalhes</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="tblReceitas" class="table-horizontal">
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
       <div class="card" style="background:#1a1440">
         <div class="card-head">
           <h3>Despesas</h3>
           <button id="toggleDesp" class="btn small secondary" type="button">Ocultar detalhes</button>
         </div>
-        <div class="table-scroll-wrapper">
+        <div class="table-wrapper">
           <table id="tblDespesas" class="table-horizontal">
-            <thead>
-              <tr id="tblDespesasHeader"></tr>
-            </thead>
-            <tbody id="tblDespesasBody"></tbody>
+            <thead><tr></tr></thead>
+            <tbody></tbody>
           </table>
         </div>
       </div>
+    </div>
 
-      <div class="card" style="margin-top:16px; background:#1a1440">
-        <h3>Saldo</h3>
-        <div class="table-scroll-wrapper">
-          <table id="tblSaldo" class="table-horizontal">
-            <thead>
-              <tr id="tblSaldoHeader"></tr>
-            </thead>
-            <tbody id="tblSaldoBody"></tbody>
-          </table>
-        </div>
+    <div class="card" style="margin-top:16px; background:#1a1440">
+      <h3>Saldo</h3>
+      <div class="table-wrapper">
+        <table id="tblSaldo" class="table-horizontal">
+          <thead><tr></tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -764,6 +767,7 @@ function collectState(){
     st[id] = (el.tagName==='SELECT' || el.type==='checkbox') ? (el.type==='checkbox'? el.checked : el.value) : el.value;
   });
   st.modelo = getModelo();
+  st.showRecDetails = showRecDetails;
   st.showDespDetails = showDespDetails;
   return st;
 }
@@ -771,13 +775,14 @@ function save(){ localStorage.setItem(storageKey, JSON.stringify(collectState())
 function load(){
   const obj = JSON.parse(localStorage.getItem(storageKey)||'{}');
   Object.entries(obj).forEach(([k,v])=>{
-    if(k==='showDespDetails' || k==='modelo') return; // tratados abaixo
+    if(k==='showRecDetails' || k==='showDespDetails' || k==='modelo') return; // tratados abaixo
     const el = $('#'+k);
     if(!el) return;
     if(el.type==='checkbox'){ el.checked = !!v; }
     else{ el.value = v; }
   });
   setModelo(obj.modelo||'usuario');
+  showRecDetails = (obj.showRecDetails!==undefined)? !!obj.showRecDetails : true;
   showDespDetails = (obj.showDespDetails!==undefined)? !!obj.showDespDetails : true;
   updateToggleButtons();
 }
@@ -794,7 +799,7 @@ function resetAll(){
   $('#eqTipoPMI').value = 'aquisicao';
   $('#pdfInsertMode').value = 'nova';
   setModelo('usuario');
-  showDespDetails = true; updateToggleButtons();
+  showRecDetails = true; showDespDetails = true; updateToggleButtons();
   $('#overlayProdutoCustos').classList.remove('show');
   $('#overlayPdf').classList.remove('show');
   computeAll();
@@ -960,95 +965,140 @@ function despesasBreakdown(m, receitaDoMes){
 }
 
 /* ===== Flags de detalhe (recolhível) ===== */
+let showRecDetails = true;
 let showDespDetails = true;
 function updateToggleButtons(){
+  $('#toggleRec').textContent  = showRecDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
   $('#toggleDesp').textContent = showDespDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
 }
+$('#toggleRec').addEventListener('click', ()=>{ showRecDetails = !showRecDetails; updateToggleButtons(); computeAll(); save(); });
 $('#toggleDesp').addEventListener('click', ()=>{ showDespDetails = !showDespDetails; updateToggleButtons(); computeAll(); save(); });
 
-/* ===== Montagem das tabelas ===== */
+/* ===== Montagem das tabelas (NOVA ESTRUTURA: MESES EM COLUNAS) ===== */
 function buildSimulacao(){
   const meses = I('meses');
-  const theadD = $('#tblDespesasHeader'); theadD.innerHTML='';
-  const tbodyD = $('#tblDespesasBody'); tbodyD.innerHTML='';
-  const theadS = $('#tblSaldoHeader'); theadS.innerHTML='';
-  const tbodyS = $('#tblSaldoBody'); tbodyS.innerHTML='';
-
-  const recMes = []; const despMes = []; const impMes = []; const saldoMes = []; const saldoAc = [];
+  const recMes = []; 
+  const despMes = []; 
+  const impMes = []; 
+  const saldoMes = []; 
+  const saldoAc = [];
   const implant = calcImplantacao().total;
 
-  // Coletar todos os dados
-  const despesasPorMes = [];
+  // Estrutura para armazenar todos os itens de receita e despesa por mês
+  const receitasPorMes = {}; // { 'Item': [val0, val1, val2...] }
+  const despesasPorMes = {}; // { 'Item': [val0, val1, val2...] }
+
   for(let m=0; m<=meses; m++){
+    // Receitas
     const recB = receitaBreakdown(m);
     let recTotal = recB.total;
+    recMes.push(recTotal);
+
+    // Armazena cada item de receita
+    recB.items.forEach(([label, val])=>{
+      if(!receitasPorMes[label]) receitasPorMes[label] = [];
+      receitasPorMes[label][m] = val;
+    });
+
+    // Despesas
     const despB = despesasBreakdown(m, recTotal);
     let despTotal = despB.total;
-
-    despesasPorMes.push(despB);
-    recMes.push(recTotal);
     despMes.push(despTotal);
-    impMes.push(despB.impostos.total||0);
 
+    // Armazena cada item de despesa
+    despB.items.forEach(([label, val])=>{
+      if(!despesasPorMes[label]) despesasPorMes[label] = [];
+      despesasPorMes[label][m] = val;
+    });
+
+    // Saldo
     const saldo = recTotal - despTotal;
     saldoMes.push(saldo);
     saldoAc.push((saldoAc[m-1]||0) + saldo);
+
+    impMes.push(despB.impostos.total||0);
   }
 
-  // Construir header de Despesas (Item/Mês, 0, 1, 2, ...)
-  let headerHtml = '<th>Item/Mês</th>';
-  for(let m=0; m<=meses; m++){
-    headerHtml += `<th>${m}</th>`;
-  }
-  theadD.innerHTML = headerHtml;
+  // Constrói tabela de RECEITAS
+  buildHorizontalTable('tblReceitas', receitasPorMes, recMes, meses, showRecDetails);
 
-  // Construir linhas de Despesas
-  if(showDespDetails){
-    // Coletar todos os itens únicos
-    const allItems = new Set();
-    despesasPorMes.forEach(d => {
-      d.items.forEach(([label]) => allItems.add(label));
-    });
+  // Constrói tabela de DESPESAS
+  buildHorizontalTable('tblDespesas', despesasPorMes, despMes, meses, showDespDetails);
 
-    // Para cada item, criar uma linha
-    allItems.forEach(item => {
-      let rowHtml = `<td>${item}</td>`;
-      for(let m=0; m<=meses; m++){
-        const despB = despesasPorMes[m];
-        const found = despB.items.find(([label]) => label === item);
-        const val = found ? found[1] : 0;
-        rowHtml += `<td>${val > 0 ? BRL(val) : '–'}</td>`;
-      }
-      tbodyD.insertAdjacentHTML('beforeend', `<tr>${rowHtml}</tr>`);
-    });
-  }
-
-  // Linha de Total de Despesas
-  let totalRowHtml = '<td><b>Total de Despesas</b></td>';
-  for(let m=0; m<=meses; m++){
-    totalRowHtml += `<td><b>${BRL(despMes[m])}</b></td>`;
-  }
-  tbodyD.insertAdjacentHTML('beforeend', `<tr>${totalRowHtml}</tr>`);
-
-  // Construir header de Saldo (Item/Mês, 0, 1, 2, ...)
-  theadS.innerHTML = headerHtml;
-
-  // Construir linhas de Saldo
-  let saldoMesRowHtml = '<td>Saldo do Mês</td>';
-  for(let m=0; m<=meses; m++){
-    const cls = saldoMes[m]>=0 ? 'ok' : 'bad';
-    saldoMesRowHtml += `<td class="${cls}">${BRL(saldoMes[m])}</td>`;
-  }
-  tbodyS.insertAdjacentHTML('beforeend', `<tr>${saldoMesRowHtml}</tr>`);
-
-  let saldoAcRowHtml = '<td>Saldo Acumulado</td>';
-  for(let m=0; m<=meses; m++){
-    const cls = saldoAc[m]>=0 ? 'ok' : 'bad';
-    saldoAcRowHtml += `<td class="${cls}">${BRL(saldoAc[m])}</td>`;
-  }
-  tbodyS.insertAdjacentHTML('beforeend', `<tr>${saldoAcRowHtml}</tr>`);
+  // Constrói tabela de SALDO
+  buildSaldoTable(saldoMes, saldoAc, meses);
 
   return {recMes, despMes, impMes, saldoMes, saldoAc, implantacao: implant};
+}
+
+function buildHorizontalTable(tableId, itemsPorMes, totaisPorMes, meses, showDetails){
+  const table = $('#' + tableId);
+  const thead = table.querySelector('thead tr');
+  const tbody = table.querySelector('tbody');
+  
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+
+  // Cabeçalho: Item/Mês | 0 | 1 | 2 | ...
+  let headerHTML = '<th>Item/Mês</th>';
+  for(let m=0; m<=meses; m++){
+    headerHTML += `<th>${m}</th>`;
+  }
+  thead.innerHTML = headerHTML;
+
+  // Se mostrar detalhes, adiciona linha para cada item
+  if(showDetails){
+    const itemLabels = Object.keys(itemsPorMes);
+    itemLabels.forEach(label => {
+      let rowHTML = `<td>${label}</td>`;
+      for(let m=0; m<=meses; m++){
+        const val = itemsPorMes[label][m] || 0;
+        rowHTML += `<td>${BRL(val)}</td>`;
+      }
+      tbody.insertAdjacentHTML('beforeend', `<tr>${rowHTML}</tr>`);
+    });
+  }
+
+  // Linha de total
+  let totalRowHTML = `<td><b>${tableId === 'tblReceitas' ? 'Total de Receitas' : 'Total de Despesas'}</b></td>`;
+  for(let m=0; m<=meses; m++){
+    totalRowHTML += `<td><b>${BRL(totaisPorMes[m])}</b></td>`;
+  }
+  tbody.insertAdjacentHTML('beforeend', `<tr>${totalRowHTML}</tr>`);
+}
+
+function buildSaldoTable(saldoMes, saldoAc, meses){
+  const table = $('#tblSaldo');
+  const thead = table.querySelector('thead tr');
+  const tbody = table.querySelector('tbody');
+  
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+
+  // Cabeçalho: Item/Mês | 0 | 1 | 2 | ...
+  let headerHTML = '<th>Item/Mês</th>';
+  for(let m=0; m<=meses; m++){
+    headerHTML += `<th>${m}</th>`;
+  }
+  thead.innerHTML = headerHTML;
+
+  // Linha: Saldo do Mês
+  let rowSaldoMes = '<td><b>Saldo do Mês</b></td>';
+  for(let m=0; m<=meses; m++){
+    const val = saldoMes[m];
+    const cls = val >= 0 ? 'ok' : 'bad';
+    rowSaldoMes += `<td class="${cls}">${BRL(val)}</td>`;
+  }
+  tbody.insertAdjacentHTML('beforeend', `<tr>${rowSaldoMes}</tr>`);
+
+  // Linha: Saldo Acumulado
+  let rowSaldoAc = '<td><b>Saldo Acumulado</b></td>';
+  for(let m=0; m<=meses; m++){
+    const val = saldoAc[m];
+    const cls = val >= 0 ? 'ok' : 'bad';
+    rowSaldoAc += `<td class="${cls}">${BRL(val)}</td>`;
+  }
+  tbody.insertAdjacentHTML('beforeend', `<tr>${rowSaldoAc}</tr>`);
 }
 
 function updateKPIs(sim){
@@ -1270,41 +1320,4 @@ init();
   const emailEl = document.getElementById('auth-email');
   const errorEl = document.getElementById('auth-error');
 
-  const client = window.supabase.createClient(PROJECT_URL, ANON_KEY, { auth: { persistSession: true, storageKey: 'camerite-auth' } });
-  window.cameriteSupabase = client;
-
-  function showGate(){ authGate.style.display = 'block'; }
-  function hideGate(){ authGate.style.display = 'none'; }
-
-  client.auth.getSession().then(({ data } )=> {
-    if (data && data.session) { localStorage.setItem('camerite_auth_ok','1'); hideGate(); }
-    else { showGate(); }
-  });
-
-  client.auth.onAuthStateChange((_event, session)=>{
-    if (session) { localStorage.setItem('camerite_auth_ok','1'); hideGate(); }
-    else { localStorage.removeItem('camerite_auth_ok'); showGate(); }
-  });
-
-  form.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    errorEl.style.display = 'none';
-    const email = emailEl.value.trim();
-    const password = document.getElementById('auth-password').value;
-    const btn = document.getElementById('auth-submit');
-    btn.disabled = true; btn.textContent = 'Entrando...';
-    const { error } = await client.auth.signInWithPassword({ email, password });
-    if (error) { errorEl.textContent = error.message || 'Falha no login. Verifique suas credenciais.'; errorEl.style.display = 'block'; }
-    btn.disabled = false; btn.textContent = 'Entrar';
-  });
-
-  window.cameriteLogout = async function() {
-    await client.auth.signOut();
-    localStorage.removeItem('camerite_auth_ok');
-    showGate();
-  };
-})();
-</script>
-
-</body>
-</html>
+  const client
