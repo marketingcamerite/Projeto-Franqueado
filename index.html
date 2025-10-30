@@ -373,7 +373,7 @@
     </div>
   </div>
 
-  <!-- 4) EQUIPAMENTO (reordenado) -->
+  <!-- 4) EQUIPAMENTO -->
   <div class="tab-panel" id="t4">
     <div class="row">
       <label>Câmera LPR — Valor (R$)
@@ -485,43 +485,45 @@
       </div>
     </div>
 
-    <div class="row" style="margin-top:16px">
-      <div class="card" style="background:#1a1440">
-        <div class="card-head">
-          <h3>Receitas</h3>
-          <button id="toggleRec" class="btn small secondary" type="button">Ocultar detalhes</button>
-        </div>
-        <div class="table-scroll">
-          <table id="tblReceitas">
-            <thead>
-              <tr><th>Item</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+    <!-- RECEITAS (sempre em coluna própria) -->
+    <div class="card" style="margin-top:16px; background:#1a1440">
+      <div class="card-head">
+        <h3>Receitas</h3>
+        <button id="toggleRec" class="btn small secondary" type="button">Ocultar detalhes</button>
       </div>
-      <div class="card" style="background:#1a1440">
-        <div class="card-head">
-          <h3>Despesas</h3>
-          <button id="toggleDesp" class="btn small secondary" type="button">Ocultar detalhes</button>
-        </div>
-        <div class="table-scroll">
-          <table id="tblDespesas">
-            <thead>
-              <tr><th>Item</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+      <div class="table-scroll">
+        <table id="tblReceitas">
+          <thead>
+            <tr><th class="item-col">Item</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
 
+    <!-- DESPESAS (logo abaixo de Receitas) -->
+    <div class="card" style="margin-top:16px; background:#1a1440">
+      <div class="card-head">
+        <h3>Despesas</h3>
+        <button id="toggleDesp" class="btn small secondary" type="button">Ocultar detalhes</button>
+      </div>
+      <div class="table-scroll">
+        <table id="tblDespesas">
+          <thead>
+            <tr><th class="item-col">Item</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SALDO (permanece abaixo) -->
     <div class="card" style="margin-top:16px; background:#1a1440">
       <h3>Saldo</h3>
       <div class="table-scroll">
         <table id="tblSaldo">
           <thead>
-            <tr><th>Item</th></tr>
+            <tr><th class="item-col">Item</th></tr>
           </thead>
           <tbody></tbody>
         </table>
