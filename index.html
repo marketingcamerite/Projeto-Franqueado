@@ -104,6 +104,55 @@
   .col-qt{width:100px}
   .col-total{width:180px; text-align:right}
 
+  /* Tabelas com scroll horizontal */
+  .table-scroll-wrapper{
+    overflow-x:auto;
+    border:1px solid var(--line);
+    border-radius:12px;
+  }
+  .table-scroll-wrapper table{
+    border:none;
+    min-width:100%;
+  }
+  .table-horizontal{
+    width:auto;
+    min-width:100%;
+  }
+  .table-horizontal thead th{
+    text-align:center;
+    min-width:90px;
+    white-space:nowrap;
+  }
+  .table-horizontal thead th:first-child{
+    text-align:left;
+    min-width:180px;
+    position:sticky;
+    left:0;
+    background:#1a1440;
+    z-index:10;
+  }
+  .table-horizontal tbody td{
+    text-align:center;
+    min-width:90px;
+    white-space:nowrap;
+  }
+  .table-horizontal tbody td:first-child{
+    text-align:left;
+    min-width:180px;
+    position:sticky;
+    left:0;
+    background:#140e2b;
+    z-index:5;
+    font-weight:600;
+  }
+  .table-horizontal tbody tr:last-child td{
+    font-weight:800;
+    background:#1a1240;
+  }
+  .table-horizontal tbody tr:last-child td:first-child{
+    background:#1a1240;
+  }
+
   .ok{color:var(--ok)} .bad{color:var(--bad)}
 
   /* Overlays (modais) */
@@ -334,17 +383,17 @@
         </div>
       </div>
 
-      <label>Internet — Qtd
+      <label>Internet – Qtd
         <input id="fxQtdInternet" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Internet — Valor (R$)
+      <label>Internet – Valor (R$)
         <input id="fxValInternet" type="text" inputmode="decimal" placeholder="0,00">
       </label>
 
-      <label>Energia — Qtd
+      <label>Energia – Qtd
         <input id="fxQtdEnergia" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Energia — Valor (R$)
+      <label>Energia – Valor (R$)
         <input id="fxValEnergia" type="text" inputmode="decimal" placeholder="0,00">
       </label>
 
@@ -353,10 +402,10 @@
       </label>
       <div></div>
 
-      <label>Despesa Financeira — Qtd
+      <label>Despesa Financeira – Qtd
         <input id="fxQtdDespesaFin" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Despesa Financeira — Valor (R$)
+      <label>Despesa Financeira – Valor (R$)
         <input id="fxValDespesaFin" type="text" inputmode="decimal" placeholder="0,00">
       </label>
     </div>
@@ -365,42 +414,42 @@
   <!-- 4) EQUIPAMENTO (reordenado) -->
   <div class="tab-panel" id="t4">
     <div class="row">
-      <label>Câmera LPR — Valor (R$)
+      <label>Câmera LPR – Valor (R$)
         <input id="eqValLPR" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Câmera LPR — Tipo
+      <label>Câmera LPR – Tipo
         <select id="eqTipoLPR" class="select-strong">
           <option value="aquisicao">Aquisição (mês 0)</option>
           <option value="locacao">Locação (mês ≥ 1)</option>
         </select>
       </label>
 
-      <label>PMI — Valor (R$)
+      <label>PMI – Valor (R$)
         <input id="eqValPMI" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>PMI — Tipo
+      <label>PMI – Tipo
         <select id="eqTipoPMI" class="select-strong">
           <option value="aquisicao">Aquisição (mês 0)</option>
           <option value="locacao">Locação (mês ≥ 1)</option>
         </select>
       </label>
 
-      <label>Toten — Valor (R$)
+      <label>Toten – Valor (R$)
         <input id="eqValToten" type="text" inputmode="decimal" placeholder="0,00">
       </label>
       <div></div>
 
-      <label>Haste — Qtd
+      <label>Haste – Qtd
         <input id="eqQtdHaste" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Haste — Valor (R$)
+      <label>Haste – Valor (R$)
         <input id="eqValHaste" type="text" inputmode="decimal" placeholder="0,00">
       </label>
 
-      <label>Poste/Caixa — Qtd
+      <label>Poste/Caixa – Qtd
         <input id="eqQtdPosteCaixa" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Poste/Caixa — Valor (R$)
+      <label>Poste/Caixa – Valor (R$)
         <input id="eqValPosteCaixa" type="text" inputmode="decimal" placeholder="0,00">
       </label>
     </div>
@@ -468,47 +517,39 @@
         <input id="meses" type="number" min="1" max="60" step="1" value="12">
       </label>
       <div style="display:flex; gap:8px; align-items:flex-end">
-        <button id="menosMes" class="btn secondary" type="button">− Meses</button>
+        <button id="menosMes" class="btn secondary" type="button">– Meses</button>
         <button id="maisMes" class="btn secondary" type="button">+ Meses</button>
         <button id="recalc" class="btn" type="button">Recalcular</button>
       </div>
     </div>
 
-    <div class="row" style="margin-top:16px">
-      <div class="card" style="background:#1a1440">
-        <div class="card-head">
-          <h3>Receitas</h3>
-          <button id="toggleRec" class="btn small secondary" type="button">Ocultar detalhes</button>
-        </div>
-        <table id="tblReceitas">
-          <thead>
-            <tr><th class="col-num">Mês</th><th>Descrição</th><th class="col-total">Total</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <div style="margin-top:16px">
       <div class="card" style="background:#1a1440">
         <div class="card-head">
           <h3>Despesas</h3>
           <button id="toggleDesp" class="btn small secondary" type="button">Ocultar detalhes</button>
         </div>
-        <table id="tblDespesas">
-          <thead>
-            <tr><th class="col-num">Mês</th><th>Descrição</th><th class="col-total">Total</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-scroll-wrapper">
+          <table id="tblDespesas" class="table-horizontal">
+            <thead>
+              <tr id="tblDespesasHeader"></tr>
+            </thead>
+            <tbody id="tblDespesasBody"></tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
-    <div class="card" style="margin-top:16px; background:#1a1440">
-      <h3>Saldo</h3>
-      <table id="tblSaldo">
-        <thead>
-          <tr><th class="col-num">Mês</th><th>Saldo do Mês</th><th>Saldo Acumulado</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="card" style="margin-top:16px; background:#1a1440">
+        <h3>Saldo</h3>
+        <div class="table-scroll-wrapper">
+          <table id="tblSaldo" class="table-horizontal">
+            <thead>
+              <tr id="tblSaldoHeader"></tr>
+            </thead>
+            <tbody id="tblSaldoBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -525,7 +566,7 @@
       <div class="box"><div class="name">Custo do Franqueado Anual</div><div class="val" id="kCustoFranqueadoTotal">R$ 0,00</div></div>
       <div class="box"><div class="name">Saldo Acumulado - 12 Meses</div><div class="val" id="kSaldoAcum12">R$ 0,00</div></div>
       <div class="box"><div class="name">Rentabilidade</div><div class="val" id="kRentab">0%</div></div>
-      <div class="box"><div class="name">Mês de Equilíbrio</div><div class="val" id="kMesEquilibrio">—</div></div>
+      <div class="box"><div class="name">Mês de Equilíbrio</div><div class="val" id="kMesEquilibrio">–</div></div>
     </div>
   </div>
 </div>
@@ -562,9 +603,9 @@
         <tr><td>Armazenamento</td><td>7 dias</td><td>R$ 27,00</td></tr>
         <tr><td>Armazenamento</td><td>30 dias</td><td>R$ 45,00</td></tr>
         <!-- Serviços Analíticos -->
-        <tr><td>OCR — Analítico</td><td>por OCR</td><td>R$ 113,00</td></tr>
-        <tr><td>Detecção de Pessoas — Analítico</td><td>por unidade</td><td>R$ 42,00</td></tr>
-        <tr><td>Detecção de Movimento — Analítico</td><td>por unidade</td><td>R$ 30,00</td></tr>
+        <tr><td>OCR – Analítico</td><td>por OCR</td><td>R$ 113,00</td></tr>
+        <tr><td>Detecção de Pessoas – Analítico</td><td>por unidade</td><td>R$ 42,00</td></tr>
+        <tr><td>Detecção de Movimento – Analítico</td><td>por unidade</td><td>R$ 30,00</td></tr>
       </tbody>
     </table>
     <div class="help" style="margin-top:8px">Demais itens possuem preços definidos no formulário (por você).</div>
@@ -723,7 +764,6 @@ function collectState(){
     st[id] = (el.tagName==='SELECT' || el.type==='checkbox') ? (el.type==='checkbox'? el.checked : el.value) : el.value;
   });
   st.modelo = getModelo();
-  st.showRecDetails = showRecDetails;
   st.showDespDetails = showDespDetails;
   return st;
 }
@@ -731,14 +771,13 @@ function save(){ localStorage.setItem(storageKey, JSON.stringify(collectState())
 function load(){
   const obj = JSON.parse(localStorage.getItem(storageKey)||'{}');
   Object.entries(obj).forEach(([k,v])=>{
-    if(k==='showRecDetails' || k==='showDespDetails' || k==='modelo') return; // tratados abaixo
+    if(k==='showDespDetails' || k==='modelo') return; // tratados abaixo
     const el = $('#'+k);
     if(!el) return;
     if(el.type==='checkbox'){ el.checked = !!v; }
     else{ el.value = v; }
   });
   setModelo(obj.modelo||'usuario');
-  showRecDetails = (obj.showRecDetails!==undefined)? !!obj.showRecDetails : true;
   showDespDetails = (obj.showDespDetails!==undefined)? !!obj.showDespDetails : true;
   updateToggleButtons();
 }
@@ -755,7 +794,7 @@ function resetAll(){
   $('#eqTipoPMI').value = 'aquisicao';
   $('#pdfInsertMode').value = 'nova';
   setModelo('usuario');
-  showRecDetails = true; showDespDetails = true; updateToggleButtons();
+  showDespDetails = true; updateToggleButtons();
   $('#overlayProdutoCustos').classList.remove('show');
   $('#overlayPdf').classList.remove('show');
   computeAll();
@@ -921,60 +960,93 @@ function despesasBreakdown(m, receitaDoMes){
 }
 
 /* ===== Flags de detalhe (recolhível) ===== */
-let showRecDetails = true;
 let showDespDetails = true;
 function updateToggleButtons(){
-  $('#toggleRec').textContent  = showRecDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
   $('#toggleDesp').textContent = showDespDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
 }
-$('#toggleRec').addEventListener('click', ()=>{ showRecDetails = !showRecDetails; updateToggleButtons(); computeAll(); save(); });
 $('#toggleDesp').addEventListener('click', ()=>{ showDespDetails = !showDespDetails; updateToggleButtons(); computeAll(); save(); });
 
 /* ===== Montagem das tabelas ===== */
 function buildSimulacao(){
   const meses = I('meses');
-  const tbodyR = $('#tblReceitas tbody'); tbodyR.innerHTML='';
-  const tbodyD = $('#tblDespesas tbody'); tbodyD.innerHTML='';
-  const tbodyS = $('#tblSaldo tbody'); tbodyS.innerHTML='';
+  const theadD = $('#tblDespesasHeader'); theadD.innerHTML='';
+  const tbodyD = $('#tblDespesasBody'); tbodyD.innerHTML='';
+  const theadS = $('#tblSaldoHeader'); theadS.innerHTML='';
+  const tbodyS = $('#tblSaldoBody'); tbodyS.innerHTML='';
 
   const recMes = []; const despMes = []; const impMes = []; const saldoMes = []; const saldoAc = [];
   const implant = calcImplantacao().total;
 
+  // Coletar todos os dados
+  const despesasPorMes = [];
   for(let m=0; m<=meses; m++){
-    // Receitas
     const recB = receitaBreakdown(m);
     let recTotal = recB.total;
-
-    // Despesas
     const despB = despesasBreakdown(m, recTotal);
     let despTotal = despB.total;
 
-    // Render Receitas
-    if(showRecDetails){
-      recB.items.forEach(([label, val])=>{
-        tbodyR.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td>${label}</td><td class="col-total">${BRL(val)}</td></tr>`);
-      });
-    }
-    tbodyR.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td><b>Total de Receitas</b></td><td class="col-total"><b>${BRL(recTotal)}</b></td></tr>`);
-
-    // Render Despesas
-    if(showDespDetails){
-      despB.items.forEach(([label, val])=>{
-        tbodyD.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td>${label}</td><td class="col-total">${BRL(val)}</td></tr>`);
-      });
-    }
-    tbodyD.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td><b>Total de Despesas</b></td><td class="col-total"><b>${BRL(despTotal)}</b></td></tr>`);
-
-    // Saldo
-    const saldo = recTotal - despTotal;
-    saldoMes.push(saldo);
-    saldoAc.push((saldoAc[m-1]||0) + saldo);
-    tbodyS.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td class="${saldo>=0?'ok':'bad'}">${BRL(saldo)}</td><td class="${(saldoAc[m]>=0)?'ok':'bad'}">${BRL(saldoAc[m])}</td></tr>`);
-
+    despesasPorMes.push(despB);
     recMes.push(recTotal);
     despMes.push(despTotal);
     impMes.push(despB.impostos.total||0);
+
+    const saldo = recTotal - despTotal;
+    saldoMes.push(saldo);
+    saldoAc.push((saldoAc[m-1]||0) + saldo);
   }
+
+  // Construir header de Despesas (Item/Mês, 0, 1, 2, ...)
+  let headerHtml = '<th>Item/Mês</th>';
+  for(let m=0; m<=meses; m++){
+    headerHtml += `<th>${m}</th>`;
+  }
+  theadD.innerHTML = headerHtml;
+
+  // Construir linhas de Despesas
+  if(showDespDetails){
+    // Coletar todos os itens únicos
+    const allItems = new Set();
+    despesasPorMes.forEach(d => {
+      d.items.forEach(([label]) => allItems.add(label));
+    });
+
+    // Para cada item, criar uma linha
+    allItems.forEach(item => {
+      let rowHtml = `<td>${item}</td>`;
+      for(let m=0; m<=meses; m++){
+        const despB = despesasPorMes[m];
+        const found = despB.items.find(([label]) => label === item);
+        const val = found ? found[1] : 0;
+        rowHtml += `<td>${val > 0 ? BRL(val) : '–'}</td>`;
+      }
+      tbodyD.insertAdjacentHTML('beforeend', `<tr>${rowHtml}</tr>`);
+    });
+  }
+
+  // Linha de Total de Despesas
+  let totalRowHtml = '<td><b>Total de Despesas</b></td>';
+  for(let m=0; m<=meses; m++){
+    totalRowHtml += `<td><b>${BRL(despMes[m])}</b></td>`;
+  }
+  tbodyD.insertAdjacentHTML('beforeend', `<tr>${totalRowHtml}</tr>`);
+
+  // Construir header de Saldo (Item/Mês, 0, 1, 2, ...)
+  theadS.innerHTML = headerHtml;
+
+  // Construir linhas de Saldo
+  let saldoMesRowHtml = '<td>Saldo do Mês</td>';
+  for(let m=0; m<=meses; m++){
+    const cls = saldoMes[m]>=0 ? 'ok' : 'bad';
+    saldoMesRowHtml += `<td class="${cls}">${BRL(saldoMes[m])}</td>`;
+  }
+  tbodyS.insertAdjacentHTML('beforeend', `<tr>${saldoMesRowHtml}</tr>`);
+
+  let saldoAcRowHtml = '<td>Saldo Acumulado</td>';
+  for(let m=0; m<=meses; m++){
+    const cls = saldoAc[m]>=0 ? 'ok' : 'bad';
+    saldoAcRowHtml += `<td class="${cls}">${BRL(saldoAc[m])}</td>`;
+  }
+  tbodyS.insertAdjacentHTML('beforeend', `<tr>${saldoAcRowHtml}</tr>`);
 
   return {recMes, despMes, impMes, saldoMes, saldoAc, implantacao: implant};
 }
@@ -991,7 +1063,7 @@ function updateKPIs(sim){
 
   let acum12 = 0; for(let i=0;i<=Math.min(12, sim.saldoMes.length-1);i++) acum12 += sim.saldoMes[i];
 
-  let mesEq = '—'; for(let i=0;i<sim.saldoAc.length;i++){ if(sim.saldoAc[i]>0){ mesEq = 'Mês '+String(i).padStart(2,'0'); break; } }
+  let mesEq = '–'; for(let i=0;i<sim.saldoAc.length;i++){ if(sim.saldoAc[i]>0){ mesEq = 'Mês '+String(i).padStart(2,'0'); break; } }
 
   $('#kContratoAnual').textContent = BRL(contratoAnual);
   $('#kReceitaMes').textContent   = BRL(m1Rec);
