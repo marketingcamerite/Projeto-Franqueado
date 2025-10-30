@@ -111,7 +111,7 @@
     position:fixed; inset:0; display:none; place-items:center;
     background:rgba(10,6,20,.8); backdrop-filter: blur(4px); z-index:1000;
     color:var(--text);
-    color-scheme: dark; /* ajuda a forçar tema escuro nativo */
+    color-scheme: dark;
   }
   .overlay .dialog{
     width:min(820px, 92vw); background:linear-gradient(180deg, #1e1648,#130c2a); border:1px solid var(--line-strong); border-radius:16px; padding:16px; box-shadow: 0 30px 50px rgba(0,0,0,.45);
@@ -121,7 +121,7 @@
   .overlay .dialog .footer{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
   .overlay.show{display:grid}
 
-  /* Inputs fortes dentro dos modais (contraste) */
+  /* Inputs fortes dentro dos modais */
   .overlay .dialog input[type="text"],
   .overlay .dialog input[type="email"],
   .overlay .dialog input[type="password"],
@@ -137,7 +137,7 @@
     background:linear-gradient(180deg, var(--brand), var(--brand-2)); color:#fff;
   }
 
-  /* === Correção extra de contraste do dropdown nativo === */
+  /* Correção extra de contraste do dropdown nativo */
   .overlay select,
   .overlay option{
     background-color:#1a1238 !important;
@@ -149,7 +149,7 @@
     background-color:#29184E !important;
     color:#FFFFFF !important;
   }
-  .overlay select::-ms-expand{ /* seta do IE/Edge antigo */
+  .overlay select::-ms-expand{
     background-color:#1a1238;
     color:#F2EDFF;
   }
@@ -167,21 +167,27 @@
     #orcamentoPrint tbody td{color:#000; border-color:#000}
     #orcamentoPrint .grand{color:#000}
   }
- }
 
-  /* ===== CORREÇÃO DE CONTRASTE DOS SELECTS ===== */
+  /* Correção de contraste dos selects gerais */
   select, option {
-    background-color: #1a1238 !important; /* fundo roxo escuro */
-    color: #F2EDFF !important;            /* texto lilás claro */
+    background-color: #1a1238 !important;
+    color: #F2EDFF !important;
   }
   select:focus, option:focus, option:hover {
-    background-color: #29184E !important; /* roxo principal da marca */
-    color: #FFFFFF !important;             /* texto branco */
+    background-color: #29184E !important;
+    color: #FFFFFF !important;
   }
   select::-ms-expand {
     background-color: #1a1238;
     color: #F2EDFF;
   }
+
+  /* Header c/ ações nas cards */
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;
+  }
+  .card-head h3{margin:0}
+  .btn.small{height:32px; padding:0 10px; border-radius:10px; font-size:12px}
 </style>
 </head>
 <body>
@@ -204,12 +210,20 @@
       <button id="modeloUsuario" class="active" aria-selected="true">Por Usuário</button>
       <button id="modeloProduto" aria-selected="false">Por Produto</button>
     </div>
+
     <div class="row" style="margin-top:12px">
+      <!-- POR USUÁRIO -->
       <div id="precoPorUsuario" style="display:block">
         <label>Valor por Usuário (R$)
           <input id="pvPorUsuario" type="text" inputmode="decimal" placeholder="0,00">
         </label>
+        <div style="margin-top:8px">
+          <button class="btn secondary" type="button" data-open-custos-base>Ver custos base (overlay)</button>
+          <div class="help">Mostra custos fixos usados no cálculo e serviços analíticos (OCR, Detecções).</div>
+        </div>
       </div>
+
+      <!-- POR PRODUTO -->
       <div id="precosPorProduto" style="display:none">
         <div class="row">
           <label>Preço Armazenamento (R$ / unidade)
@@ -232,10 +246,11 @@
           </label>
         </div>
         <div style="margin-top:8px">
-          <button id="btnCustosBase" class="btn secondary" type="button">Ver custos base (overlay)</button>
-          <div class="help">Mostra custos fixos usados no cálculo (Armazenamento e OCR).</div>
+          <button class="btn secondary" type="button" data-open-custos-base>Ver custos base (overlay)</button>
+          <div class="help">Mostra custos fixos usados no cálculo e serviços analíticos (OCR, Detecções).</div>
         </div>
       </div>
+
       <div>
         <label>Quantidade de Usuários
           <input id="qtdUsuarios" type="number" min="0" step="1" placeholder="0">
@@ -333,7 +348,7 @@
         <input id="fxValEnergia" type="text" inputmode="decimal" placeholder="0,00">
       </label>
 
-      <label>Fundo de Manutenção (R$/mês)
+      <label>Fundo de Manutenção (R$/mês por unidade)
         <input id="fxValFundo" type="text" inputmode="decimal" placeholder="0,00">
       </label>
       <div></div>
@@ -347,7 +362,7 @@
     </div>
   </div>
 
-  <!-- 4) EQUIPAMENTO -->
+  <!-- 4) EQUIPAMENTO (reordenado) -->
   <div class="tab-panel" id="t4">
     <div class="row">
       <label>Câmera LPR — Valor (R$)
@@ -370,6 +385,11 @@
         </select>
       </label>
 
+      <label>Toten — Valor (R$)
+        <input id="eqValToten" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <div></div>
+
       <label>Haste — Qtd
         <input id="eqQtdHaste" type="number" min="0" step="1" placeholder="0">
       </label>
@@ -377,9 +397,6 @@
         <input id="eqValHaste" type="text" inputmode="decimal" placeholder="0,00">
       </label>
 
-      <label>Toten — Valor (R$)
-        <input id="eqValToten" type="text" inputmode="decimal" placeholder="0,00">
-      </label>
       <label>Poste/Caixa — Qtd
         <input id="eqQtdPosteCaixa" type="number" min="0" step="1" placeholder="0">
       </label>
@@ -459,7 +476,10 @@
 
     <div class="row" style="margin-top:16px">
       <div class="card" style="background:#1a1440">
-        <h3>Receitas</h3>
+        <div class="card-head">
+          <h3>Receitas</h3>
+          <button id="toggleRec" class="btn small secondary" type="button">Ocultar detalhes</button>
+        </div>
         <table id="tblReceitas">
           <thead>
             <tr><th class="col-num">Mês</th><th>Descrição</th><th class="col-total">Total</th></tr>
@@ -468,7 +488,10 @@
         </table>
       </div>
       <div class="card" style="background:#1a1440">
-        <h3>Despesas</h3>
+        <div class="card-head">
+          <h3>Despesas</h3>
+          <button id="toggleDesp" class="btn small secondary" type="button">Ocultar detalhes</button>
+        </div>
         <table id="tblDespesas">
           <thead>
             <tr><th class="col-num">Mês</th><th>Descrição</th><th class="col-total">Total</th></tr>
@@ -538,7 +561,10 @@
         <tr><td>Armazenamento</td><td>3 dias</td><td>R$ 19,00</td></tr>
         <tr><td>Armazenamento</td><td>7 dias</td><td>R$ 27,00</td></tr>
         <tr><td>Armazenamento</td><td>30 dias</td><td>R$ 45,00</td></tr>
-        <tr><td>OCR</td><td>base 30 dias</td><td>R$ 45,00</td></tr>
+        <!-- Serviços Analíticos -->
+        <tr><td>OCR — Analítico</td><td>por OCR</td><td>R$ 113,00</td></tr>
+        <tr><td>Detecção de Pessoas — Analítico</td><td>por unidade</td><td>R$ 42,00</td></tr>
+        <tr><td>Detecção de Movimento — Analítico</td><td>por unidade</td><td>R$ 30,00</td></tr>
       </tbody>
     </table>
     <div class="help" style="margin-top:8px">Demais itens possuem preços definidos no formulário (por você).</div>
@@ -650,7 +676,8 @@ $('#modeloProduto').addEventListener('click', ()=> setModelo('produto'));
 
 /* ===== Custos base ===== */
 const custoArmazenamentoMap = {1:15, 3:19, 7:27, 30:45};
-const custoOCR = 45;
+const custoOCRStorage = 45;   // armazenamento fixo de 30d para OCR (independente do projeto)
+const ANALITICO = { OCR:113, DET_MOV:30, DET_PES:42 };
 function custoArmSelecionado(){ const dias = parseInt($('#armazenamentoDias').value||7); return custoArmazenamentoMap[dias] || 27; }
 
 /* ===== Abas ===== */
@@ -665,7 +692,9 @@ $$('.tabs button').forEach(b=>{
 });
 
 /* ===== Overlays ===== */
-$('#btnCustosBase')?.addEventListener('click', ()=> $('#overlayProdutoCustos').classList.add('show'));
+$$('[data-open-custos-base]').forEach(btn=>{
+  btn.addEventListener('click', ()=> $('#overlayProdutoCustos').classList.add('show'));
+});
 $('#closeCustosBase').addEventListener('click', ()=> $('#overlayProdutoCustos').classList.remove('show'));
 
 $('#btnExportar').addEventListener('click', ()=> $('#overlayPdf').classList.add('show'));
@@ -694,30 +723,31 @@ function collectState(){
     st[id] = (el.tagName==='SELECT' || el.type==='checkbox') ? (el.type==='checkbox'? el.checked : el.value) : el.value;
   });
   st.modelo = getModelo();
+  st.showRecDetails = showRecDetails;
+  st.showDespDetails = showDespDetails;
   return st;
 }
 function save(){ localStorage.setItem(storageKey, JSON.stringify(collectState())); }
 function load(){
   const obj = JSON.parse(localStorage.getItem(storageKey)||'{}');
   Object.entries(obj).forEach(([k,v])=>{
+    if(k==='showRecDetails' || k==='showDespDetails' || k==='modelo') return; // tratados abaixo
     const el = $('#'+k);
     if(!el) return;
     if(el.type==='checkbox'){ el.checked = !!v; }
     else{ el.value = v; }
   });
   setModelo(obj.modelo||'usuario');
+  showRecDetails = (obj.showRecDetails!==undefined)? !!obj.showRecDetails : true;
+  showDespDetails = (obj.showDespDetails!==undefined)? !!obj.showDespDetails : true;
+  updateToggleButtons();
 }
 
 /* ===== Reset total ===== */
 function resetAll(){
-  // limpa storage
   localStorage.removeItem(storageKey);
-
-  // limpa campos
   $$('#tabs input[type="text"], #tabs input[type="number"]').forEach(el=> el.value = '');
   $$('#tabs input[type="checkbox"]').forEach(el=> el.checked = false);
-
-  // valores padrão
   $('#meses').value = '12';
   $('#armazenamentoDias').value = '7';
   $('#instMargemPct').value = '15';
@@ -725,11 +755,9 @@ function resetAll(){
   $('#eqTipoPMI').value = 'aquisicao';
   $('#pdfInsertMode').value = 'nova';
   setModelo('usuario');
-
-  // fecha modais
+  showRecDetails = true; showDespDetails = true; updateToggleButtons();
   $('#overlayProdutoCustos').classList.remove('show');
   $('#overlayPdf').classList.remove('show');
-
   computeAll();
   save();
 }
@@ -748,18 +776,14 @@ $('#menosMes').addEventListener('click', ()=>{
 $('#recalc').addEventListener('click', ()=>{ computeAll(); save(); });
 
 /* ====== Cálculos ====== */
-function receitaMensalBase(){
-  const m = getModelo();
-  if(m==='usuario'){
-    return I('qtdUsuarios') * M('pvPorUsuario');
-  }else{
-    return I('qtdArmazenamento')*M('pvArmazenamento')
-         + I('qtdPMI')*M('pvPMI')
-         + I('qtdOCR')*M('pvOCR')
-         + I('qtdToten')*M('pvToten')
-         + I('qtdDetMov')*M('pvDetMov')
-         + I('qtdDetPes')*M('pvDetPes');
-  }
+function receitaMensalBaseUsuario(){ return I('qtdUsuarios') * M('pvPorUsuario'); }
+function receitaMensalBaseProduto(){
+  return I('qtdArmazenamento')*M('pvArmazenamento')
+       + I('qtdPMI')*M('pvPMI')
+       + I('qtdOCR')*M('pvOCR')
+       + I('qtdToten')*M('pvToten')
+       + I('qtdDetMov')*M('pvDetMov')
+       + I('qtdDetPes')*M('pvDetPes');
 }
 function calcImplantacao(){
   const subtotal = M('instValCam') + M('instValLPR') + M('instValToten') + M('instValPoste') + M('instValFrete') + M('instValAdesao') + M('instValDesloc');
@@ -774,7 +798,7 @@ function calcImplantacao(){
 function calcDespesaArmazenamento(){
   const qtdBase = I('qtdToten')*4 + I('qtdArmazenamento') + I('qtdPMI');
   const r1 = qtdBase * custoArmSelecionado();
-  const r2 = I('qtdOCR') * custoOCR;
+  const r2 = I('qtdOCR') * custoOCRStorage; // armazenamento fixo de 30d para OCR
   return r1 + r2;
 }
 function calcDespesaCameraPMI(m){
@@ -784,13 +808,38 @@ function calcDespesaCameraPMI(m){
   if(tipo==='aquisicao'){ return m===0 ? val : 0; }
   return m>=1 ? val : 0;
 }
-function fixosMensais(){
+function calcDespesaLPR(m){
+  const val = M('eqValLPR') * I('qtdOCR');
+  const tipo = $('#eqTipoLPR').value || 'aquisicao';
+  if(tipo==='aquisicao'){ return m===0 ? val : 0; }
+  return m>=1 ? val : 0;
+}
+function calcDespesaToten(m){
+  const val = M('eqValToten') * I('qtdToten');
+  return m===0 ? val : 0; // aquisição
+}
+function calcDespesaHastePoste(m){
+  const haste = I('eqQtdHaste') * M('eqValHaste');
+  const poste = I('eqQtdPosteCaixa') * M('eqValPosteCaixa');
+  return m===0 ? (haste + poste) : 0; // aquisição
+}
+function despInstalacao(m){
+  const val = M('instValCam') + M('instValLPR') + M('instValToten') + M('instValPoste');
+  return m===0 ? val : 0;
+}
+function despFreteDesloc(m){
+  const val = M('instValFrete') + M('instValDesloc');
+  return m===0 ? val : 0;
+}
+function fixosMensaisDetalhados(){
   const internet = I('fxQtdInternet') * M('fxValInternet');
   const energia  = I('fxQtdEnergia') * M('fxValEnergia');
-  const fundo    = M('fxValFundo');
   const despFin  = I('fxQtdDespesaFin') * M('fxValDespesaFin');
   const roy      = I('qtdUsuarios') * M('royaltyPorUsuario');
-  return {internet, energia, fundo, despFin, roy};
+  // Fundo de Manutenção: (Toten×4 + PMI + OCR) × (valor por unidade)
+  const unidades = I('qtdToten')*4 + I('qtdPMI') + I('qtdOCR');
+  const manut    = unidades * M('fxValFundo');
+  return {internet, energia, manut, despFin, roy};
 }
 function impostosDoMes(receita, custosSemImp){
   let impM = 0, impF = 0;
@@ -801,6 +850,87 @@ function impostosDoMes(receita, custosSemImp){
   }
   return {impM, impF, total: impM + impF};
 }
+
+/* ===== Quebra de receitas por mês ===== */
+function receitaBreakdown(m){
+  const items = [];
+  let total = 0;
+  const impl = calcImplantacao().total;
+
+  if(m===0){
+    if(impl>0){ items.push(['Implantação (receita única)', impl]); total += impl; }
+    return {items, total, labels: ['Implantação']};
+  }
+
+  if(getModelo()==='usuario'){
+    const val = receitaMensalBaseUsuario();
+    if(val>0){ items.push(['Usuários', val]); total += val; }
+  }else{
+    const add = (label, val)=>{ if(val>0){ items.push([label, val]); total += val; } };
+    add('Armazenamento',       I('qtdArmazenamento')*M('pvArmazenamento'));
+    add('Combo PMI',           I('qtdPMI')*M('pvPMI'));
+    add('Combo OCR',           I('qtdOCR')*M('pvOCR'));
+    add('Toten',               I('qtdToten')*M('pvToten'));
+    add('Detecção de Movimento', I('qtdDetMov')*M('pvDetMov'));
+    add('Detecção de Pessoas',   I('qtdDetPes')*M('pvDetPes'));
+  }
+  return {items, total};
+}
+
+/* ===== Quebra de despesas por mês (17 itens) ===== */
+function despesasBreakdown(m, receitaDoMes){
+  const items = [];
+  let custosSemImp = 0;
+
+  const add = (label, val)=>{ if(val>0){ items.push([label, val]); custosSemImp += val; } };
+
+  if(m>=1){
+    add('Armazenamento', calcDespesaArmazenamento());
+  }
+  // Equipamentos / Instalação
+  add('Câmera',       calcDespesaCameraPMI(m));  // PMI
+  add('Câmera LPR',   calcDespesaLPR(m));
+  add('Toten',        calcDespesaToten(m));
+  add('Instalação',   despInstalacao(m));
+  if(m>=1){
+    add('Analítico OCR', I('qtdOCR') * ANALITICO.OCR);
+    add('Detecção de Movimento', I('qtdDetMov') * ANALITICO.DET_MOV);
+    add('Detecção de Pessoas',   I('qtdDetPes') * ANALITICO.DET_PES);
+  }
+  add('Frete/Desloc.', despFreteDesloc(m));
+  add('Haste/Poste+Caixa', calcDespesaHastePoste(m));
+
+  if(m>=1){
+    const fix = fixosMensaisDetalhados();
+    if(fix.internet>0) add('Internet', fix.internet);
+    if(fix.energia>0)  add('Energia',  fix.energia);
+    if(fix.manut>0)    add('Manutenção', fix.manut);
+    if(fix.roy>0)      add('Royalties', fix.roy);
+    if(fix.despFin>0)  add('Despesa Financeira', fix.despFin);
+  }
+
+  // Impostos (calculados sobre receita e custos sem impostos)
+  const imp = impostosDoMes(receitaDoMes, custosSemImp);
+  const total = custosSemImp + imp.total;
+
+  // Itens de impostos devem aparecer sempre que >0
+  if(imp.impM>0) items.push(['Imposto Matriz', imp.impM]);
+  if(imp.impF>0) items.push(['Imposto Franqueado', imp.impF]);
+
+  return {items, total, impostos: imp};
+}
+
+/* ===== Flags de detalhe (recolhível) ===== */
+let showRecDetails = true;
+let showDespDetails = true;
+function updateToggleButtons(){
+  $('#toggleRec').textContent  = showRecDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
+  $('#toggleDesp').textContent = showDespDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
+}
+$('#toggleRec').addEventListener('click', ()=>{ showRecDetails = !showRecDetails; updateToggleButtons(); computeAll(); save(); });
+$('#toggleDesp').addEventListener('click', ()=>{ showDespDetails = !showDespDetails; updateToggleButtons(); computeAll(); save(); });
+
+/* ===== Montagem das tabelas ===== */
 function buildSimulacao(){
   const meses = I('meses');
   const tbodyR = $('#tblReceitas tbody'); tbodyR.innerHTML='';
@@ -810,39 +940,45 @@ function buildSimulacao(){
   const recMes = []; const despMes = []; const impMes = []; const saldoMes = []; const saldoAc = [];
   const implant = calcImplantacao().total;
 
-  for(let m=0;m<=meses;m++){
-    let rec = 0; const itensR = [];
-    if(m===0 && implant>0){ rec += implant; itensR.push(['Implantação (receita única)', implant]); }
-    if(m>=1){ const rBase = receitaMensalBase(); rec += rBase; itensR.push(['Mensalidade', rBase]); }
+  for(let m=0; m<=meses; m++){
+    // Receitas
+    const recB = receitaBreakdown(m);
+    let recTotal = recB.total;
 
-    let desp = 0; const itensD = [];
-    if(m>=1){
-      const arm = calcDespesaArmazenamento(); if(arm>0){ desp+=arm; itensD.push(['Armazenamento', arm]); }
-      const fix = fixosMensais();
-      if(fix.internet>0){ desp+=fix.internet; itensD.push(['Internet', fix.internet]); }
-      if(fix.energia>0){ desp+=fix.energia; itensD.push(['Energia', fix.energia]); }
-      if(fix.fundo>0){ desp+=fix.fundo; itensD.push(['Fundo de Manutenção', fix.fundo]); }
-      if(fix.roy>0){ desp+=fix.roy; itensD.push(['Royalties', fix.roy]); }
-      if(fix.despFin>0){ desp+=fix.despFin; itensD.push(['Despesa Financeira', fix.despFin]); }
+    // Despesas
+    const despB = despesasBreakdown(m, recTotal);
+    let despTotal = despB.total;
+
+    // Render Receitas
+    if(showRecDetails){
+      recB.items.forEach(([label, val])=>{
+        tbodyR.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td>${label}</td><td class="col-total">${BRL(val)}</td></tr>`);
+      });
     }
-    const cam = calcDespesaCameraPMI(m); if(cam>0){ desp+=cam; itensD.push(['Câmera (PMI)', cam]); }
+    tbodyR.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td><b>Total de Receitas</b></td><td class="col-total"><b>${BRL(recTotal)}</b></td></tr>`);
 
-    const imp = impostosDoMes(rec, desp);
-    if(imp.total>0){ itensD.push(['Impostos (Matriz+Franqueado)', imp.total]); }
+    // Render Despesas
+    if(showDespDetails){
+      despB.items.forEach(([label, val])=>{
+        tbodyD.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td>${label}</td><td class="col-total">${BRL(val)}</td></tr>`);
+      });
+    }
+    tbodyD.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td><b>Total de Despesas</b></td><td class="col-total"><b>${BRL(despTotal)}</b></td></tr>`);
 
-    tbodyR.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td>${itensR.map(x=>x[0]).join(' + ')||'—'}</td><td class="col-total">${BRL(rec)}</td></tr>`);
-    tbodyD.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td>${itensD.map(x=>x[0]).join(' + ')||'—'}</td><td class="col-total">${BRL(desp + imp.total)}</td></tr>`);
-
-    const saldo = rec - (desp + imp.total);
+    // Saldo
+    const saldo = recTotal - despTotal;
     saldoMes.push(saldo);
     saldoAc.push((saldoAc[m-1]||0) + saldo);
-
     tbodyS.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(m).padStart(2,'0')}</td><td class="${saldo>=0?'ok':'bad'}">${BRL(saldo)}</td><td class="${(saldoAc[m]>=0)?'ok':'bad'}">${BRL(saldoAc[m])}</td></tr>`);
 
-    recMes.push(rec); despMes.push(desp + imp.total); impMes.push(imp.total);
+    recMes.push(recTotal);
+    despMes.push(despTotal);
+    impMes.push(despB.impostos.total||0);
   }
+
   return {recMes, despMes, impMes, saldoMes, saldoAc, implantacao: implant};
 }
+
 function updateKPIs(sim){
   const m1Rec = sim.recMes[1]||0;
   const m1Desp= sim.despMes[1]||0;
@@ -867,6 +1003,8 @@ function updateKPIs(sim){
   $('#kRentab').textContent = (rent).toFixed(1).replace('.',',')+'%';
   $('#kMesEquilibrio').textContent = mesEq;
 }
+
+/* ===== Orçamento (PDF) ===== */
 function buildPrintable(){
   const tbody = $('#tblOrc tbody'); tbody.innerHTML='';
   const {rows, mensal} = buildBudgetRows();
@@ -891,18 +1029,16 @@ function buildBudgetRows(){
     add('Plano por Usuário', M('pvPorUsuario'), I('qtdUsuarios'));
   }else{
     add('Armazenamento', M('pvArmazenamento'), I('qtdArmazenamento'));
-    add('PMI',            M('pvPMI'),           I('qtdPMI'));
-    add('OCR',            M('pvOCR'),           I('qtdOCR'));
-    add('Toten',          M('pvToten'),         I('qtdToten'));
-    add('Detecção Movimento', M('pvDetMov'),    I('qtdDetMov'));
-    add('Detecção Pessoas',   M('pvDetPes'),    I('qtdDetPes'));
+    add('Combo PMI',      M('pvPMI'),          I('qtdPMI'));
+    add('Combo OCR',      M('pvOCR'),          I('qtdOCR'));
+    add('Toten',          M('pvToten'),        I('qtdToten'));
+    add('Detecção Movimento', M('pvDetMov'),   I('qtdDetMov'));
+    add('Detecção Pessoas',   M('pvDetPes'),   I('qtdDetPes'));
   }
   return {rows, mensal};
 }
 
-/* ===== PDF: desenha orçamento na página =====
-   - mode 'nova': cria página nova e pagina se necessário
-   - mode 'ultima': NÃO cria página nova e escala tudo para caber numa única página existente */
+/* ===== PDF: desenha orçamento na página ===== */
 async function drawOrcamentoOnPage(pdfDoc, page, mode){
   const { rows, mensal } = buildBudgetRows();
   const { width, height } = page.getSize();
@@ -920,7 +1056,6 @@ async function drawOrcamentoOnPage(pdfDoc, page, mode){
   const helv = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const helvB = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
 
-  // Altura necessária (estimativa) para decidir escala no modo 'ultima'
   function textLines(text, maxW, size){
     const words = String(text).split(' ');
     const out=[]; let cur='';
@@ -936,7 +1071,7 @@ async function drawOrcamentoOnPage(pdfDoc, page, mode){
   let rowsH = 0;
   rows.forEach(r=>{
     const lines = textLines(r.desc, colDesc-6, bodySize).length || 1;
-    rowsH += Math.max(lineH, lines*lineH) + 6; // +linha separadora
+    rowsH += Math.max(lineH, lines*lineH) + 6;
   });
   const footerH = 20;
   const needed = margin + headerH + rowsH + footerH + margin;
@@ -944,7 +1079,6 @@ async function drawOrcamentoOnPage(pdfDoc, page, mode){
 
   if(mode==='ultima' && needed > available){
     const scale = (available - 2*margin) / (needed - 2*margin);
-    // escala tamanhos (mantendo colunas)
     titleSize *= scale;
     headSize  *= scale;
     bodySize  *= scale;
@@ -953,13 +1087,11 @@ async function drawOrcamentoOnPage(pdfDoc, page, mode){
 
   let y = height - margin;
 
-  // Título (sem cobrir conteúdo existente)
   page.drawText('Orçamento / Proposta Comercial', {
     x: margin, y: y - titleSize, size: titleSize, font: helvB, color: rgb(0,0,0)
   });
   y -= (titleSize + 12);
 
-  // Cabeçalho
   function headerCell(txt, x){ page.drawText(txt, {x, y: y - headSize, size: headSize, font: helvB, color: rgb(0,0,0)}); }
   headerCell('Nº', margin);
   headerCell('Descrição do Produto', margin+colN);
@@ -975,7 +1107,6 @@ async function drawOrcamentoOnPage(pdfDoc, page, mode){
     const rowHeight = Math.max(lineH, descLines.length*lineH);
 
     if(mode==='nova' && (y - rowHeight) < margin + 60){
-      // quebra de página apenas no modo 'nova'
       const newPage = pdfDoc.addPage([width, height]);
       y = height - margin;
       page = newPage;
@@ -987,17 +1118,14 @@ async function drawOrcamentoOnPage(pdfDoc, page, mode){
       y -= 6;
     }
 
-    // número
     page.drawText(String(r.i).padStart(2,'0'), {x:margin, y: y - bodySize, size: bodySize, font: helv, color: rgb(0,0,0)});
 
-    // descrição
     let ly = y - bodySize;
     descLines.forEach(line=>{
       page.drawText(line, {x: margin+colN, y: ly, size: bodySize, font: helv, color: rgb(0,0,0)});
       ly -= lineH;
     });
 
-    // numéricos à direita
     function drawRight(text, xRight){
       const w = helv.widthOfTextAtSize(text, bodySize);
       page.drawText(text, {x: xRight - w, y: y - bodySize, size: bodySize, font: helv, color: rgb(0,0,0)});
@@ -1012,7 +1140,6 @@ async function drawOrcamentoOnPage(pdfDoc, page, mode){
 
   rows.forEach(drawRow);
 
-  // Mensalidade
   y -= 14;
   const label = 'Mensalidade: ' + BRL(mensal);
   const wlab = helvB.widthOfTextAtSize(label, 12);
@@ -1027,7 +1154,6 @@ $('#btnGenerateFromPdf').addEventListener('click', async ()=>{
   if(!file){ err.textContent='Selecione um PDF de proposta.'; err.style.display='block'; return; }
 
   try{
-    // arrayBuffer com fallback
     let arrayBuf;
     if (file.arrayBuffer) arrayBuf = await file.arrayBuffer();
     else arrayBuf = await new Response(file).arrayBuffer();
@@ -1036,10 +1162,10 @@ $('#btnGenerateFromPdf').addEventListener('click', async ()=>{
     let page;
 
     if(mode==='nova'){
-      page = pdfDoc.addPage(); // cria nova página no final
+      page = pdfDoc.addPage();
     }else{
       const pages = pdfDoc.getPages();
-      page = pages[pages.length-1]; // usa a última — sem criar nova e sem cobrir com branco
+      page = pages[pages.length-1];
     }
 
     await drawOrcamentoOnPage(pdfDoc, page, mode);
@@ -1060,7 +1186,7 @@ $('#btnGenerateFromPdf').addEventListener('click', async ()=>{
 
 /* ===== Principal ===== */
 function computeAll(){ const sim = buildSimulacao(); updateKPIs(sim); }
-function init(){ load(); computeAll(); }
+function init(){ load(); computeAll(); updateToggleButtons(); }
 init();
 
 /* ===== Supabase Auth ===== */
