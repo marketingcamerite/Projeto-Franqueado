@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Camerite • Calculadora do Franqueado</title>
-<style>
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=suKUcnns-YotPYEnUQgrXE-fNK0xTVAo70rISy3-Y3KOCX25NKMGc2iOrAHlXcg56F-17XzdL3ksBCs0SVVCpnYvVy8BNr-h8vw2hzwvBb2ISW9GaeYMlutaedDsFQdlRoH4OINmyBTC03Y8GO8qewEFVAkoe0jhPSWZlwpHXcMflEK4KcmbV2xYR9pr6hMN9MHqnT7YjgGVzqv7jp4A8CmnZYCkoft_XoBrU4LzYyJg0EwcAkbj8byYn2U82mizHx0kArvtHQA6tGxFaI_Jpg" charset="UTF-8"></script><style>
   :root{
     --bg:#0f0b22;
     --panel:#171235;
@@ -190,13 +190,10 @@
 
   /* ===== Estilos adicionais apenas para a visualização pivot da aba 6 ===== */
   .table-scroll{ overflow:auto; border-radius:12px; }
-  /* Permite que a tabela tenha largura natural maior que o container para habilitar rolagem horizontal */
   #t6 .table-scroll table{ width:auto; min-width:100%; }
-  /* Primeira coluna fixa ao rolar na horizontal (melhora leitura) */
   th.item-col, td.item-col{
     position:sticky; left:0; background:#1a1440; z-index:1;
   }
-  /* Linha total em destaque */
   tr.total-row td{ font-weight:800; }
 </style>
 </head>
@@ -224,40 +221,38 @@
     <div class="row" style="margin-top:12px">
       <!-- POR USUÁRIO -->
       <div id="precoPorUsuario" style="display:block">
-        <label>Valor por Usuário (R$)
+        <label>Valor por Usuário
           <input id="pvPorUsuario" type="text" inputmode="decimal" placeholder="0,00">
         </label>
         <div style="margin-top:8px">
-          <button class="btn secondary" type="button" data-open-custos-base>Ver custos base (overlay)</button>
-          <div class="help">Mostra custos fixos usados no cálculo e serviços analíticos (OCR, Detecções).</div>
-        </div>
+          <button class="btn secondary" type="button" data-open-custos-base>Ver Custos Base</button>
+                  </div>
       </div>
 
       <!-- POR PRODUTO -->
       <div id="precosPorProduto" style="display:none">
         <div class="row">
-          <label>Preço Armazenamento (R$ / unidade)
+          <label>Preço Armazenamento
             <input id="pvArmazenamento" type="text" inputmode="decimal" placeholder="0,00">
           </label>
-          <label>Preço PMI (R$ / unidade)
+          <label>Preço PMI
             <input id="pvPMI" type="text" inputmode="decimal" placeholder="0,00">
           </label>
-          <label>Preço OCR (R$ / unidade)
-            <input id="pvOCR" type="text" inputmode="decimal" placeholder="0,00">
+          <label>Preço LPR
+            <input id="pvLPR" type="text" inputmode="decimal" placeholder="0,00">
           </label>
-          <label>Preço Toten (R$ / unidade)
+          <label>Preço Toten
             <input id="pvToten" type="text" inputmode="decimal" placeholder="0,00">
           </label>
-          <label>Preço Detecção Movimento (R$ / unidade)
+          <label>Preço Detecção Movimento
             <input id="pvDetMov" type="text" inputmode="decimal" placeholder="0,00">
           </label>
-          <label>Preço Detecção Pessoas (R$ / unidade)
+          <label>Preço Detecção Pessoas
             <input id="pvDetPes" type="text" inputmode="decimal" placeholder="0,00">
           </label>
         </div>
         <div style="margin-top:8px">
-          <button class="btn secondary" type="button" data-open-custos-base>Ver custos base (overlay)</button>
-          <div class="help">Mostra custos fixos usados no cálculo e serviços analíticos (OCR, Detecções).</div>
+          <button class="btn secondary" type="button" data-open-custos-base>Ver Custos Base</button>
         </div>
       </div>
 
@@ -283,7 +278,7 @@
   <!-- 2) PRODUTOS -->
   <div class="tab-panel active" id="t2">
     <div class="row">
-      <label>Armazenamento do Projeto (dias)
+      <label>Armazenamento do Projeto
         <select id="armazenamentoDias" class="select-strong">
           <option value="1">1 dia (R$ 15,00)</option>
           <option value="3">3 dias (R$ 19,00)</option>
@@ -294,22 +289,22 @@
 
       <div></div>
 
-      <label>Armazenamento (qtd)
+      <label>Armazenamento
         <input id="qtdArmazenamento" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Combo PMI (qtd)
+      <label>Combo PMI
         <input id="qtdPMI" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Combo OCR (qtd)
-        <input id="qtdOCR" type="number" min="0" step="1" placeholder="0">
+      <label>Combo LPR
+        <input id="qtdLPR" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Toten de Monitoramento (qtd)
+      <label>Toten de Monitoramento
         <input id="qtdToten" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Detecção de Movimento (qtd)
+      <label>Detecção de Movimento
         <input id="qtdDetMov" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Detecção de Pessoas (qtd)
+      <label>Detecção de Pessoas
         <input id="qtdDetPes" type="number" min="0" step="1" placeholder="0">
       </label>
     </div>
@@ -318,7 +313,7 @@
   <!-- 3) CUSTOS MENSAIS FIXOS -->
   <div class="tab-panel" id="t3">
     <div class="row">
-      <label>Royalties por Usuário (R$/mês)
+      <label>Royalties por Usuário
         <input id="royaltyPorUsuario" type="text" inputmode="decimal" placeholder="0,00">
       </label>
       <div></div>
@@ -344,29 +339,29 @@
         </div>
       </div>
 
-      <label>Internet — Qtd
+      <label>Internet
         <input id="fxQtdInternet" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Internet — Valor (R$)
+      <label>Valor
         <input id="fxValInternet" type="text" inputmode="decimal" placeholder="0,00">
       </label>
 
-      <label>Energia — Qtd
+      <label>Energia
         <input id="fxQtdEnergia" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Energia — Valor (R$)
+      <label>Valor
         <input id="fxValEnergia" type="text" inputmode="decimal" placeholder="0,00">
       </label>
 
-      <label>Fundo de Manutenção (R$/mês por unidade)
+      <label>Fundo de Manutenção
         <input id="fxValFundo" type="text" inputmode="decimal" placeholder="0,00">
       </label>
       <div></div>
 
-      <label>Despesa Financeira — Qtd
+      <label>Despesa Financeira
         <input id="fxQtdDespesaFin" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Despesa Financeira — Valor (R$)
+      <label>Despesa Financeira
         <input id="fxValDespesaFin" type="text" inputmode="decimal" placeholder="0,00">
       </label>
     </div>
@@ -375,42 +370,42 @@
   <!-- 4) EQUIPAMENTO -->
   <div class="tab-panel" id="t4">
     <div class="row">
-      <label>Câmera LPR — Valor (R$)
+      <label>Câmera LPR
         <input id="eqValLPR" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Câmera LPR — Tipo
+      <label>Equipamento
         <select id="eqTipoLPR" class="select-strong">
-          <option value="aquisicao">Aquisição (mês 0)</option>
-          <option value="locacao">Locação (mês ≥ 1)</option>
+          <option value="aquisicao">Aquisição</option>
+          <option value="locacao">Locação</option>
         </select>
       </label>
 
-      <label>PMI — Valor (R$)
+      <label>PMI
         <input id="eqValPMI" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>PMI — Tipo
+      <label>Equipamento
         <select id="eqTipoPMI" class="select-strong">
-          <option value="aquisicao">Aquisição (mês 0)</option>
-          <option value="locacao">Locação (mês ≥ 1)</option>
+          <option value="aquisicao">Aquisição</option>
+          <option value="locacao">Locação</option>
         </select>
       </label>
 
-      <label>Toten — Valor (R$)
+      <label>Toten
         <input id="eqValToten" type="text" inputmode="decimal" placeholder="0,00">
       </label>
       <div></div>
 
-      <label>Haste — Qtd
+      <label>Haste
         <input id="eqQtdHaste" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Haste — Valor (R$)
+      <label>Valor
         <input id="eqValHaste" type="text" inputmode="decimal" placeholder="0,00">
       </label>
 
-      <label>Poste/Caixa — Qtd
+      <label>Poste/Caixa
         <input id="eqQtdPosteCaixa" type="number" min="0" step="1" placeholder="0">
       </label>
-      <label>Poste/Caixa — Valor (R$)
+      <label>Valor
         <input id="eqValPosteCaixa" type="text" inputmode="decimal" placeholder="0,00">
       </label>
     </div>
@@ -419,28 +414,28 @@
   <!-- 5) CUSTOS DE IMPLANTAÇÃO -->
   <div class="tab-panel" id="t5">
     <div class="row">
-      <label>Instalação Câmera (R$)
+      <label>Instalação Câmera
         <input id="instValCam" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Instalação LPR (R$)
+      <label>Instalação LPR
         <input id="instValLPR" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Instalação Toten (R$)
+      <label>Instalação Toten
         <input id="instValToten" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Instalação Poste (R$)
+      <label>Instalação Poste
         <input id="instValPoste" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Frete (R$)
+      <label>Frete
         <input id="instValFrete" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Valor da Adesão (R$)
+      <label>Valor da Adesão
         <input id="instValAdesao" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Deslocamento e Outros (R$)
+      <label>Deslocamento e Outros
         <input id="instValDesloc" type="text" inputmode="decimal" placeholder="0,00">
       </label>
-      <label>Margem de Implantação (%)
+      <label>Margem de Implantação
         <select id="instMargemPct" class="select-strong">
           <option value="0">0%</option>
           <option value="5">5%</option>
@@ -452,10 +447,10 @@
         </select>
       </label>
       <div class="card" style="grid-column:1/-1; background:#1a1440">
-        <h3>Valor de Implantação (soma + margem)</h3>
+        <h3>Valor de Implantação</h3>
         <div class="row">
           <div>
-            <div class="help">Subtotal (Câm + LPR + Toten + Poste + Frete + Adesão + Desloc.)</div>
+            <div class="help">Subtotal</div>
             <div id="instSubtotal" style="font-weight:800; margin-top:6px">R$ 0,00</div>
           </div>
           <div>
@@ -463,7 +458,7 @@
             <div id="instMargemVal" style="font-weight:800; margin-top:6px">R$ 0,00</div>
           </div>
           <div>
-            <div class="help">Valor Final (receita no mês 0)</div>
+            <div class="help">Valor Final</div>
             <div id="instValorFinal" style="font-weight:900; font-size:18px; margin-top:6px">R$ 0,00</div>
           </div>
         </div>
@@ -474,7 +469,7 @@
   <!-- 6) SIMULAÇÃO POR MÊS -->
   <div class="tab-panel" id="t6">
     <div class="row">
-      <label>Meses para simular
+      <label>Meses Para Simular
         <input id="meses" type="number" min="1" max="60" step="1" value="12">
       </label>
       <div style="display:flex; gap:8px; align-items:flex-end">
@@ -484,11 +479,11 @@
       </div>
     </div>
 
-    <!-- RECEITAS (sempre em coluna própria) -->
+    <!-- RECEITAS -->
     <div class="card" style="margin-top:16px; background:#1a1440">
       <div class="card-head">
         <h3>Receitas</h3>
-        <button id="toggleRec" class="btn small secondary" type="button">Ocultar detalhes</button>
+        <button id="toggleRec" class="btn small secondary" type="button">Ocultar Detalhes</button>
       </div>
       <div class="table-scroll">
         <table id="tblReceitas">
@@ -500,11 +495,11 @@
       </div>
     </div>
 
-    <!-- DESPESAS (logo abaixo de Receitas) -->
+    <!-- DESPESAS -->
     <div class="card" style="margin-top:16px; background:#1a1440">
       <div class="card-head">
         <h3>Despesas</h3>
-        <button id="toggleDesp" class="btn small secondary" type="button">Ocultar detalhes</button>
+        <button id="toggleDesp" class="btn small secondary" type="button">Ocultar Detalhes</button>
       </div>
       <div class="table-scroll">
         <table id="tblDespesas">
@@ -516,7 +511,7 @@
       </div>
     </div>
 
-    <!-- SALDO (permanece abaixo) -->
+    <!-- SALDO -->
     <div class="card" style="margin-top:16px; background:#1a1440">
       <h3>Saldo</h3>
       <div class="table-scroll">
@@ -531,7 +526,7 @@
   </div>
 </div>
 
-<!-- 7) DASHBOARD (final da página) -->
+<!-- 7) DASHBOARD -->
 <div class="container" id="dashboardBlock">
   <div class="card" style="margin-top:16px">
     <h2>7) Dashboard</h2>
@@ -541,8 +536,8 @@
       <div class="box"><div class="name">Custo Mensal (Franqueado)</div><div class="val" id="kCustoMes">R$ 0,00</div></div>
       <div class="box"><div class="name">Imposto Mês</div><div class="val" id="kImpostoMes">R$ 0,00</div></div>
       <div class="box"><div class="name">Custo do Franqueado Anual</div><div class="val" id="kCustoFranqueadoTotal">R$ 0,00</div></div>
-      <div class="box"><div class="name">Saldo Acumulado - 12 Meses</div><div class="val" id="kSaldoAcum12">R$ 0,00</div></div>
-      <div class="box"><div class="name">Rentabilidade</div><div class="val" id="kRentab">0%</div></div>
+      <div class="box"><div class="name">Saldo Acumulado</div><div class="val" id="kSaldoAcum12">R$ 0,00</div></div>
+      <div class="box"><div class="name">Rentabilidade</div><div class="val" id="kRentab">0,00%</div></div>
       <div class="box"><div class="name">Mês de Equilíbrio</div><div class="val" id="kMesEquilibrio">—</div></div>
     </div>
   </div>
@@ -571,7 +566,7 @@
 <!-- ===== Overlay: Custos Base ===== -->
 <div class="overlay" id="overlayProdutoCustos" role="dialog" aria-modal="true" aria-label="Custos base">
   <div class="dialog">
-    <h3>Custos base utilizados no cálculo</h3>
+    <h3>Custos Serviços</h3>
     <table>
       <thead><tr><th>Item</th><th>Critério</th><th>Custo</th></tr></thead>
       <tbody>
@@ -579,13 +574,11 @@
         <tr><td>Armazenamento</td><td>3 dias</td><td>R$ 19,00</td></tr>
         <tr><td>Armazenamento</td><td>7 dias</td><td>R$ 27,00</td></tr>
         <tr><td>Armazenamento</td><td>30 dias</td><td>R$ 45,00</td></tr>
-        <!-- Serviços Analíticos -->
-        <tr><td>OCR — Analítico</td><td>por OCR</td><td>R$ 113,00</td></tr>
-        <tr><td>Detecção de Pessoas — Analítico</td><td>por unidade</td><td>R$ 42,00</td></tr>
-        <tr><td>Detecção de Movimento — Analítico</td><td>por unidade</td><td>R$ 30,00</td></tr>
+        <tr><td>LPR</td><td>Analítico</td><td>R$ 113,00</td></tr>
+        <tr><td>Detecção de Pessoas</td><td>Analítico</td><td>R$ 42,00</td></tr>
+        <tr><td>Detecção de Movimento</td><td>Analítico</td><td>R$ 30,00</td></tr>
       </tbody>
     </table>
-    <div class="help" style="margin-top:8px">Demais itens possuem preços definidos no formulário (por você).</div>
     <div class="footer">
       <button class="btn secondary" type="button" id="closeCustosBase">Fechar</button>
     </div>
@@ -686,8 +679,8 @@ $('#modeloProduto').addEventListener('click', ()=> setModelo('produto'));
 
 /* ===== Custos base ===== */
 const custoArmazenamentoMap = {1:15, 3:19, 7:27, 30:45};
-const custoOCRStorage = 45;   // armazenamento fixo de 30d para OCR (independente do projeto)
-const ANALITICO = { OCR:113, DET_MOV:30, DET_PES:42 };
+const custoLPRStorage = 45;
+const ANALITICO = { LPR:113, DET_MOV:30, DET_PES:42 };
 function custoArmSelecionado(){ const dias = parseInt($('#armazenamentoDias').value||7); return custoArmazenamentoMap[dias] || 27; }
 
 /* ===== Abas ===== */
@@ -731,7 +724,7 @@ function save(){ localStorage.setItem(storageKey, JSON.stringify(collectState())
 function load(){
   const obj = JSON.parse(localStorage.getItem(storageKey)||'{}');
   Object.entries(obj).forEach(([k,v])=>{
-    if(k==='showRecDetails' || k==='showDespDetails' || k==='modelo') return; // tratados abaixo
+    if(k==='showRecDetails' || k==='showDespDetails' || k==='modelo') return;
     const el = $('#'+k);
     if(!el) return;
     if(el.type==='checkbox'){ el.checked = !!v; }
@@ -780,22 +773,21 @@ function receitaMensalBaseUsuario(){ return I('qtdUsuarios') * M('pvPorUsuario')
 function receitaMensalBaseProduto(){
   return I('qtdArmazenamento')*M('pvArmazenamento')
        + I('qtdPMI')*M('pvPMI')
-       + I('qtdOCR')*M('pvOCR')
+       + I('qtdLPR')*M('pvLPR')
        + I('qtdToten')*M('pvToten')
        + I('qtdDetMov')*M('pvDetMov')
        + I('qtdDetPes')*M('pvDetPes');
 }
 
-/* >>>>>>> Alteração: cálculo de implantação multiplicando por quantidades <<<<<<< */
+/* >>>>>>> Cálculo de implantação (multiplica por quantidades) <<<<<<< */
 function calcImplantacao(){
-  // Novo cálculo conforme solicitado: multiplica instalação por quantidades e soma frete/adesão/desloc., depois aplica a margem
   const qtdPMI   = I('qtdPMI');
-  const qtdOCR   = I('qtdOCR');
+  const qtdLPR   = I('qtdLPR');
   const qtdToten = I('qtdToten');
   const qtdPoste = I('eqQtdPosteCaixa');
 
   const subtotal = (qtdPMI   * M('instValCam'))
-                 + (qtdOCR   * M('instValLPR'))
+                 + (qtdLPR   * M('instValLPR'))
                  + (qtdToten * M('instValToten'))
                  + (qtdPoste * M('instValPoste'))
                  + M('instValFrete') + M('instValAdesao') + M('instValDesloc');
@@ -813,7 +805,7 @@ function calcImplantacao(){
 function calcDespesaArmazenamento(){
   const qtdBase = I('qtdToten')*4 + I('qtdArmazenamento') + I('qtdPMI');
   const r1 = qtdBase * custoArmSelecionado();
-  const r2 = I('qtdOCR') * custoOCRStorage; // armazenamento fixo de 30d para OCR
+  const r2 = I('qtdLPR') * custoLPRStorage;
   return r1 + r2;
 }
 function calcDespesaCameraPMI(m){
@@ -824,20 +816,19 @@ function calcDespesaCameraPMI(m){
   return m>=1 ? val : 0;
 }
 function calcDespesaLPR(m){
-  const val = M('eqValLPR') * I('qtdOCR');
+  const val = M('eqValLPR') * I('qtdLPR');
   const tipo = $('#eqTipoLPR').value || 'aquisicao';
   if(tipo==='aquisicao'){ return m===0 ? val : 0; }
   return m>=1 ? val : 0;
 }
 function calcDespesaToten(m){
   const val = M('eqValToten') * I('qtdToten');
-  const tipo = 'aquisicao';
-  return m===0 ? val : 0; // aquisição
+  return m===0 ? val : 0;
 }
 function calcDespesaHastePoste(m){
   const haste = I('eqQtdHaste') * M('eqValHaste');
   const poste = I('eqQtdPosteCaixa') * M('eqValPosteCaixa');
-  return m===0 ? (haste + poste) : 0; // aquisição
+  return m===0 ? (haste + poste) : 0;
 }
 function despInstalacao(m){
   const val = M('instValCam') + M('instValLPR') + M('instValToten') + M('instValPoste');
@@ -852,8 +843,7 @@ function fixosMensaisDetalhados(){
   const energia  = I('fxQtdEnergia') * M('fxValEnergia');
   const despFin  = I('fxQtdDespesaFin') * M('fxValDespesaFin');
   const roy      = I('qtdUsuarios') * M('royaltyPorUsuario');
-  // Fundo de Manutenção: (Toten×4 + PMI + OCR) × (valor por unidade)
-  const unidades = I('qtdToten')*4 + I('qtdPMI') + I('qtdOCR');
+  const unidades = I('qtdToten')*4 + I('qtdPMI') + I('qtdLPR');
   const manut    = unidades * M('fxValFundo');
   return {internet, energia, manut, despFin, roy};
 }
@@ -874,8 +864,8 @@ function receitaBreakdown(m){
   const impl = calcImplantacao().total;
 
   if(m===0){
-    if(impl>0){ items.push(['Implantação (receita única)', impl]); total += impl; }
-    return {items, total, labels: ['Implantação (receita única)']};
+    if(impl>0){ items.push(['Implantação', impl]); total += impl; }
+    return {items, total, labels: ['Implantação']};
   }
 
   if(getModelo()==='usuario'){
@@ -885,7 +875,7 @@ function receitaBreakdown(m){
     const add = (label, val)=>{ if(val>0){ items.push([label, val]); total += val; } };
     add('Armazenamento',       I('qtdArmazenamento')*M('pvArmazenamento'));
     add('Combo PMI',           I('qtdPMI')*M('pvPMI'));
-    add('Combo OCR',           I('qtdOCR')*M('pvOCR'));
+    add('Combo LPR',           I('qtdLPR')*M('pvLPR'));
     add('Toten',               I('qtdToten')*M('pvToten'));
     add('Detecção de Movimento', I('qtdDetMov')*M('pvDetMov'));
     add('Detecção de Pessoas',   I('qtdDetPes')*M('pvDetPes'));
@@ -893,7 +883,7 @@ function receitaBreakdown(m){
   return {items, total};
 }
 
-/* ===== Quebra de despesas por mês (17 itens) ===== */
+/* ===== Quebra de despesas por mês ===== */
 function despesasBreakdown(m, receitaDoMes){
   const items = [];
   let custosSemImp = 0;
@@ -903,13 +893,12 @@ function despesasBreakdown(m, receitaDoMes){
   if(m>=1){
     add('Armazenamento', calcDespesaArmazenamento());
   }
-  // Equipamentos / Instalação
-  add('Câmera',       calcDespesaCameraPMI(m));  // PMI
+  add('Câmera',       calcDespesaCameraPMI(m));
   add('Câmera LPR',   calcDespesaLPR(m));
   add('Toten',        calcDespesaToten(m));
   add('Instalação',   despInstalacao(m));
   if(m>=1){
-    add('Analítico OCR', I('qtdOCR') * ANALITICO.OCR);
+    add('Analítico LPR', I('qtdLPR') * ANALITICO.LPR);
     add('Detecção de Movimento', I('qtdDetMov') * ANALITICO.DET_MOV);
     add('Detecção de Pessoas',   I('qtdDetPes') * ANALITICO.DET_PES);
   }
@@ -925,23 +914,21 @@ function despesasBreakdown(m, receitaDoMes){
     if(fix.despFin>0)  add('Despesa Financeira', fix.despFin);
   }
 
-  // Impostos (calculados sobre receita e custos sem impostos)
   const imp = impostosDoMes(receitaDoMes, custosSemImp);
   const total = custosSemImp + imp.total;
 
-  // Itens de impostos devem aparecer sempre que >0
   if(imp.impM>0) items.push(['Imposto Matriz', imp.impM]);
   if(imp.impF>0) items.push(['Imposto Franqueado', imp.impF]);
 
   return {items, total, impostos: imp};
 }
 
-/* ===== Flags de detalhe (recolhível) ===== */
+/* ===== Flags de detalhe ===== */
 let showRecDetails = true;
 let showDespDetails = true;
 function updateToggleButtons(){
-  $('#toggleRec').textContent  = showRecDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
-  $('#toggleDesp').textContent = showDespDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
+  $('#toggleRec').textContent  = showRecDetails ? 'Ocultar Detalhes' : 'Mostrar detalhes';
+  $('#toggleDesp').textContent = showDespDetails ? 'Ocultar Detalhes' : 'Mostrar detalhes';
 }
 $('#toggleRec').addEventListener('click', ()=>{ showRecDetails = !showRecDetails; updateToggleButtons(); computeAll(); save(); });
 $('#toggleDesp').addEventListener('click', ()=>{ showDespDetails = !showDespDetails; updateToggleButtons(); computeAll(); save(); });
@@ -995,8 +982,6 @@ function buildSimulacao(){
   buildPivotHeader(tblS, meses);
 
   const recMes = []; const despMes = []; const impMes = []; const saldoMes = []; const saldoAc = [];
-  const implant = calcImplantacao().total;
-
   const recMaps = []; const despMaps = [];
   const recLabels = []; const despLabels = [];
   const addLabel = (arr, label)=>{ if(!arr.includes(label)) arr.push(label); };
@@ -1022,7 +1007,7 @@ function buildSimulacao(){
     saldoAc.push((saldoAc[m-1]||0) + saldo);
   }
 
-  // Receitas (itens em linhas, meses em colunas)
+  // Receitas
   if(showRecDetails){
     recLabels.forEach(label=>{
       let row = `<tr><td class="item-col">${label}</td>`;
@@ -1034,17 +1019,15 @@ function buildSimulacao(){
       tbodyR.insertAdjacentHTML('beforeend', row);
     });
   }
-  // Total de Receitas (sempre aparece)
-  {
+  { // Total de Receitas
     let row = `<tr class="total-row"><td class="item-col">Total de Receitas</td>`;
     for(let m=0; m<=meses; m++){ row += fmtCell(recMes[m], true); }
     row += `</tr>`;
     tbodyR.insertAdjacentHTML('beforeend', row);
   }
 
-  // Despesas (itens em linhas, meses em colunas)
+  // Despesas
   if(showDespDetails){
-    // Ordem solicitada: demais itens primeiro e, ao final, "Imposto Matriz", "Imposto Franqueado"
     const outros = despLabels.filter(l => l!=='Imposto Matriz' && l!=='Imposto Franqueado');
     const impostosOrdenados = ['Imposto Matriz','Imposto Franqueado'].filter(l => despLabels.includes(l));
     const ordered = [...outros, ...impostosOrdenados];
@@ -1058,17 +1041,15 @@ function buildSimulacao(){
       tbodyD.insertAdjacentHTML('beforeend', row);
     });
   }
-  // Total de Despesas (sempre aparece)
-  {
+  { // Total de Despesas
     let row = `<tr class="total-row"><td class="item-col">Total de Despesas</td>`;
     for(let m=0; m<=meses; m++){ row += fmtCell(despMes[m], true); }
     row += `</tr>`;
     tbodyD.insertAdjacentHTML('beforeend', row);
   }
 
-  // Saldo (linhas fixas)
+  // Saldo
   {
-    // Saldo do mês
     let rowMes = `<tr><td class="item-col">Saldo do mês</td>`;
     for(let m=0; m<=meses; m++){
       const v = saldoMes[m] || 0;
@@ -1078,7 +1059,6 @@ function buildSimulacao(){
     rowMes += `</tr>`;
     tbodyS.insertAdjacentHTML('beforeend', rowMes);
 
-    // Saldo acumulado
     let rowAc = `<tr><td class="item-col">Saldo acumulado</td>`;
     for(let m=0; m<=meses; m++){
       const v = saldoAc[m] || 0;
@@ -1089,7 +1069,7 @@ function buildSimulacao(){
     tbodyS.insertAdjacentHTML('beforeend', rowAc);
   }
 
-  // KPIs
+  /* ================= KPI's ================= */
   $('#kReceitaMes').textContent = BRL(recMes[1]||0);
   $('#kCustoMes').textContent   = BRL(despMes[1]||0);
   $('#kImpostoMes').textContent = BRL(impMes[1]||0);
@@ -1103,10 +1083,13 @@ function buildSimulacao(){
   for(let m=1; m<=Math.min(12, meses); m++){ custoAnualFranqueado += (despMes[m]||0); }
   $('#kCustoFranqueadoTotal').textContent = BRL(custoAnualFranqueado);
 
-  // Rentabilidade (aprox): (total recebido 12m - custo franqueado 12m) / custo franqueado 12m
-  const totalRecebido12m = (recMes[1]||0)*12 + (recMes[0]||0);
-  const rentab = custoAnualFranqueado>0 ? ((totalRecebido12m - custoAnualFranqueado)/custoAnualFranqueado)*100 : 0;
-  $('#kRentab').textContent = `${rentab.toFixed(0)}%`;
+  // Saldo Acumulado (do último mês simulado, incluindo mês 0)
+  const saldoAcumFinal = saldoAc[Math.min(meses, saldoAc.length-1)] || 0;
+  $('#kSaldoAcum12').textContent = BRL(saldoAcumFinal);
+
+  // Rentabilidade: Saldo Acumulado / Valor do Contrato Anual (2 casas). Se contrato = 0 → 0,00%
+  const rentPct = contratoAnual > 0 ? (saldoAcumFinal / contratoAnual) * 100 : 0;
+  $('#kRentab').textContent = `${rentPct.toFixed(2).replace('.',',')}%`;
 
   // Mês de equilíbrio (primeiro saldo acumulado >= 0)
   let mesEq = '—';
@@ -1115,7 +1098,6 @@ function buildSimulacao(){
 }
 
 function buildPrintable(){
-  // Monta tabela de orçamento simples a partir dos dados do formulário (para imprimir)
   const tbody = $('#tblOrc tbody'); tbody.innerHTML = '';
   let i=1, grand=0;
 
@@ -1132,13 +1114,12 @@ function buildPrintable(){
     tbody.appendChild(tr);
   };
 
-  // Modelo Por Usuário
   if(getModelo()==='usuario'){
     push('Usuários', M('pvPorUsuario'), I('qtdUsuarios'));
-  }else{ // Por Produto
+  }else{
     push('Armazenamento', M('pvArmazenamento'), I('qtdArmazenamento'));
     push('PMI', M('pvPMI'), I('qtdPMI'));
-    push('OCR', M('pvOCR'), I('qtdOCR'));
+    push('LPR', M('pvLPR'), I('qtdLPR'));
     push('Toten', M('pvToten'), I('qtdToten'));
     push('Detecção de Movimento', M('pvDetMov'), I('qtdDetMov'));
     push('Detecção de Pessoas', M('pvDetPes'), I('qtdDetPes'));
@@ -1147,7 +1128,7 @@ function buildPrintable(){
   $('#grandMensal').textContent = `Mensalidade: ${BRL(grand)}`;
 }
 
-/* ===== Auth (gate simplificado) — opcional ===== */
+/* ===== Auth (fake) ===== */
 async function fakeSupabaseSignIn(email, password){
   return { error: null };
 }
