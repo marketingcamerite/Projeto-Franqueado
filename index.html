@@ -23,7 +23,6 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0; padding:0; background:radial-gradient(1200px 600px at 20% -10%, #2b1b5d 0%, #120a24 42%, #0c0720 100%); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";}
-
   header{
     position:sticky; top:0; z-index:50;
     display:flex; align-items:center; justify-content:space-between;
@@ -644,28 +643,20 @@
         Senha
         <input id="auth-password" type="password" required autocomplete="current-password" style="height:44px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#140e2b; color:#F2EDFF; padding:0 12px;">
       </label>
-      <button id="auth-submit" type="submit" class="btn" style="height:48px;">Entrar</button>
-      <div id="auth-error" style="display:none; color:#ff8c8c; font-size:13px; line-height:1.3;"></div>
-      <div style="display:flex; justify-content:flex-start; align-items:center; margin-top:6px; color:#a99fd1; font-size:12px;">
-        <span>Protegido com Supabase Auth</span>
-      </div>
+      <button id="auth-submit" class="btn" type="submit">Entrar</button>
+      <div id="auth-error" class="help" style="color:#ffb0b0; display:none"></div>
     </form>
   </div>
 </div>
 
-<!-- Libs -->
-<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-/* ===== Helpers ===== */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const BRL = v => (isNaN(v)?0:v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const moneyToNum = s=>{
   if(typeof s==='number') return s;
   if(!s) return 0;
-  let x = String(s).replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3,})/g,'');
+  let x = String(s).replace(/[^\d,-]/g,'').replace(/\.(?=\d{3,})/g,'');
   x = x.replace(',', '.');
   const n = parseFloat(x);
   return isNaN(n)?0:n;
@@ -724,22 +715,12 @@ $('#btnPrintOnly').addEventListener('click', ()=>{
   setTimeout(()=>window.print(), 10);
 });
 
-/* ===== Estado ===== */
+/* ===== Persistência ===== */
 function collectState(){
-  const ids = [
-    'meses','armazenamentoDias',
-    'qtdArmazenamento','qtdPMI','qtdOCR','qtdToten','qtdDetMov','qtdDetPes','qtdUsuarios',
-    'pvArmazenamento','pvPMI','pvOCR','pvToten','pvDetMov','pvDetPes','pvPorUsuario',
-    'royaltyPorUsuario','impMatriz','incluiMatriz','impFranqueado','incluiFranqueado',
-    'fxQtdInternet','fxValInternet','fxQtdEnergia','fxValEnergia','fxValFundo','fxQtdDespesaFin','fxValDespesaFin',
-    'eqValLPR','eqTipoLPR','eqValPMI','eqTipoPMI','eqQtdHaste','eqValHaste','eqValToten','eqQtdPosteCaixa','eqValPosteCaixa',
-    'instValCam','instValLPR','instValToten','instValPoste','instValFrete','instValAdesao','instValDesloc','instMargemPct'
-  ];
   const st = {};
-  ids.forEach(id=>{
-    const el = $('#'+id);
-    if(!el) return;
-    st[id] = (el.tagName==='SELECT' || el.type==='checkbox') ? (el.type==='checkbox'? el.checked : el.value) : el.value;
+  $$('#tabs input, #tabs select, #top-fixed input, #top-fixed select').forEach(el=>{
+    if(!el.id) return;
+    st[el.id] = (el.type==='checkbox') ? !!el.checked : el.value;
   });
   st.modelo = getModelo();
   st.showRecDetails = showRecDetails;
@@ -804,16 +785,31 @@ function receitaMensalBaseProduto(){
        + I('qtdDetMov')*M('pvDetMov')
        + I('qtdDetPes')*M('pvDetPes');
 }
+
+/* >>>>>>> Alteração: cálculo de implantação multiplicando por quantidades <<<<<<< */
 function calcImplantacao(){
-  const subtotal = M('instValCam') + M('instValLPR') + M('instValToten') + M('instValPoste') + M('instValFrete') + M('instValAdesao') + M('instValDesloc');
+  // Novo cálculo conforme solicitado: multiplica instalação por quantidades e soma frete/adesão/desloc., depois aplica a margem
+  const qtdPMI   = I('qtdPMI');
+  const qtdOCR   = I('qtdOCR');
+  const qtdToten = I('qtdToten');
+  const qtdPoste = I('eqQtdPosteCaixa');
+
+  const subtotal = (qtdPMI   * M('instValCam'))
+                 + (qtdOCR   * M('instValLPR'))
+                 + (qtdToten * M('instValToten'))
+                 + (qtdPoste * M('instValPoste'))
+                 + M('instValFrete') + M('instValAdesao') + M('instValDesloc');
+
   const margemPct = pctToNum($('#instMargemPct').value);
   const margemVal = subtotal * (margemPct/100);
   const total = subtotal + margemVal;
+
   $('#instSubtotal').textContent = BRL(subtotal);
   $('#instMargemVal').textContent = BRL(margemVal);
   $('#instValorFinal').textContent = BRL(total);
   return {subtotal, margemVal, total};
 }
+
 function calcDespesaArmazenamento(){
   const qtdBase = I('qtdToten')*4 + I('qtdArmazenamento') + I('qtdPMI');
   const r1 = qtdBase * custoArmSelecionado();
@@ -835,6 +831,7 @@ function calcDespesaLPR(m){
 }
 function calcDespesaToten(m){
   const val = M('eqValToten') * I('qtdToten');
+  const tipo = 'aquisicao';
   return m===0 ? val : 0; // aquisição
 }
 function calcDespesaHastePoste(m){
@@ -1047,7 +1044,11 @@ function buildSimulacao(){
 
   // Despesas (itens em linhas, meses em colunas)
   if(showDespDetails){
-    despLabels.forEach(label=>{
+    // Ordem solicitada: demais itens primeiro e, ao final, "Imposto Matriz", "Imposto Franqueado"
+    const outros = despLabels.filter(l => l!=='Imposto Matriz' && l!=='Imposto Franqueado');
+    const impostosOrdenados = ['Imposto Matriz','Imposto Franqueado'].filter(l => despLabels.includes(l));
+    const ordered = [...outros, ...impostosOrdenados];
+    ordered.forEach(label=>{
       let row = `<tr><td class="item-col">${label}</td>`;
       for(let m=0; m<=meses; m++){
         const v = despMaps[m].get(label) || 0;
@@ -1088,263 +1089,99 @@ function buildSimulacao(){
     tbodyS.insertAdjacentHTML('beforeend', rowAc);
   }
 
-  return {recMes, despMes, impMes, saldoMes, saldoAc, implantacao: implant};
-}
+  // KPIs
+  $('#kReceitaMes').textContent = BRL(recMes[1]||0);
+  $('#kCustoMes').textContent   = BRL(despMes[1]||0);
+  $('#kImpostoMes').textContent = BRL(impMes[1]||0);
 
-function updateKPIs(sim){
-  const m1Rec = sim.recMes[1]||0;
-  const m1Desp= sim.despMes[1]||0;
-  const m1Imp = sim.impMes[1]||0;
-
-  let somaReceitas12 = 0; for(let i=1;i<=Math.min(12, sim.recMes.length-1);i++) somaReceitas12 += sim.recMes[i];
-  const contratoAnual = somaReceitas12 + (sim.implantacao||0);
-
-  let somaDespesas12 = 0; for(let i=1;i<=Math.min(12, sim.despMes.length-1);i++) somaDespesas12 += sim.despMes[i];
-
-  let acum12 = 0; for(let i=0;i<=Math.min(12, sim.saldoMes.length-1);i++) acum12 += sim.saldoMes[i];
-
-  let mesEq = '—'; for(let i=0;i<sim.saldoAc.length;i++){ if(sim.saldoAc[i]>0){ mesEq = 'Mês '+String(i).padStart(2,'0'); break; } }
-
+  // Contrato anual: receita mensal * 12 + implantação (mês 0)
+  const contratoAnual = (recMes[1]||0)*12 + (recMes[0]||0);
   $('#kContratoAnual').textContent = BRL(contratoAnual);
-  $('#kReceitaMes').textContent   = BRL(m1Rec);
-  $('#kCustoMes').textContent     = BRL(m1Desp - m1Imp);
-  $('#kImpostoMes').textContent   = BRL(m1Imp);
-  $('#kCustoFranqueadoTotal').textContent = BRL(somaDespesas12);
-  $('#kSaldoAcum12').textContent  = BRL(acum12);
-  const rent = contratoAnual>0 ? (acum12/contratoAnual*100) : 0;
-  $('#kRentab').textContent = (rent).toFixed(1).replace('.',',')+'%';
+
+  // Custo franqueado anual (12 meses)
+  let custoAnualFranqueado = 0;
+  for(let m=1; m<=Math.min(12, meses); m++){ custoAnualFranqueado += (despMes[m]||0); }
+  $('#kCustoFranqueadoTotal').textContent = BRL(custoAnualFranqueado);
+
+  // Rentabilidade (aprox): (total recebido 12m - custo franqueado 12m) / custo franqueado 12m
+  const totalRecebido12m = (recMes[1]||0)*12 + (recMes[0]||0);
+  const rentab = custoAnualFranqueado>0 ? ((totalRecebido12m - custoAnualFranqueado)/custoAnualFranqueado)*100 : 0;
+  $('#kRentab').textContent = `${rentab.toFixed(0)}%`;
+
+  // Mês de equilíbrio (primeiro saldo acumulado >= 0)
+  let mesEq = '—';
+  for(let m=0; m<=meses; m++){ if(saldoAc[m]>=0){ mesEq = `Mês ${String(m).padStart(2,'0')}`; break; } }
   $('#kMesEquilibrio').textContent = mesEq;
 }
 
-/* ===== Orçamento (PDF) ===== */
 function buildPrintable(){
-  const tbody = $('#tblOrc tbody'); tbody.innerHTML='';
-  const {rows, mensal} = buildBudgetRows();
-  rows.forEach(r=>{
-    tbody.insertAdjacentHTML('beforeend', `<tr><td class="col-num">${String(r.i).padStart(2,'0')}</td><td>${r.desc}</td><td class="col-preco">${BRL(r.preco)}</td><td class="col-qt">${r.qt}</td><td class="col-total">${BRL(r.total)}</td></tr>`);
-  });
-  $('#grandMensal').textContent = 'Mensalidade: ' + BRL(mensal);
+  // Monta tabela de orçamento simples a partir dos dados do formulário (para imprimir)
+  const tbody = $('#tblOrc tbody'); tbody.innerHTML = '';
+  let i=1, grand=0;
+
+  const push = (desc, preco, qt) =>{
+    if(!preco || !qt) return;
+    const total = preco*qt; grand += total;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="col-num">${i++}</td>
+      <td>${desc}</td>
+      <td class="col-preco">${BRL(preco)}</td>
+      <td class="col-qt">${qt}</td>
+      <td class="col-total">${BRL(total)}</td>`;
+    tbody.appendChild(tr);
+  };
+
+  // Modelo Por Usuário
+  if(getModelo()==='usuario'){
+    push('Usuários', M('pvPorUsuario'), I('qtdUsuarios'));
+  }else{ // Por Produto
+    push('Armazenamento', M('pvArmazenamento'), I('qtdArmazenamento'));
+    push('PMI', M('pvPMI'), I('qtdPMI'));
+    push('OCR', M('pvOCR'), I('qtdOCR'));
+    push('Toten', M('pvToten'), I('qtdToten'));
+    push('Detecção de Movimento', M('pvDetMov'), I('qtdDetMov'));
+    push('Detecção de Pessoas', M('pvDetPes'), I('qtdDetPes'));
+  }
+
+  $('#grandMensal').textContent = `Mensalidade: ${BRL(grand)}`;
 }
 
-/* ===== Monta linhas do orçamento (para DOM e PDF) ===== */
-function buildBudgetRows(){
-  const rows = [];
-  let i=1, mensal=0;
-  const modelo = getModelo();
-  function add(desc, preco, qt){
-    if(qt>0 && preco>0){
-      const total = preco*qt; mensal += total;
-      rows.push({ i:i++, desc, preco, qt, total });
-    }
-  }
-  if(modelo==='usuario'){
-    add('Plano por Usuário', M('pvPorUsuario'), I('qtdUsuarios'));
+/* ===== Auth (gate simplificado) — opcional ===== */
+async function fakeSupabaseSignIn(email, password){
+  return { error: null };
+}
+document.getElementById('auth-form')?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('auth-submit');
+  btn.disabled = true; btn.textContent = 'Entrando...';
+  const { error } = await fakeSupabaseSignIn(
+    document.getElementById('auth-email').value,
+    document.getElementById('auth-password').value
+  );
+  if(error){
+    document.getElementById('auth-error').textContent = error.message || 'Erro ao entrar';
+    document.getElementById('auth-error').style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Entrar';
   }else{
-    add('Armazenamento', M('pvArmazenamento'), I('qtdArmazenamento'));
-    add('Combo PMI',      M('pvPMI'),          I('qtdPMI'));
-    add('Combo OCR',      M('pvOCR'),          I('qtdOCR'));
-    add('Toten',          M('pvToten'),        I('qtdToten'));
-    add('Detecção Movimento', M('pvDetMov'),   I('qtdDetMov'));
-    add('Detecção Pessoas',   M('pvDetPes'),   I('qtdDetPes'));
-  }
-  return {rows, mensal};
-}
-
-/* ===== PDF: desenha orçamento na página ===== */
-async function drawOrcamentoOnPage(pdfDoc, page, mode){
-  const { rows, mensal } = buildBudgetRows();
-  const { width, height } = page.getSize();
-
-  let margin = 40;
-  let colN = 28, colPreco = 90, colQt = 36, colTotal = 110;
-  let colDesc = width - 2*margin - colN - colPreco - colQt - colTotal;
-
-  let titleSize = 18;
-  let headSize = 11;
-  let bodySize = 10;
-  let lineH = 18;
-
-  const rgb = PDFLib.rgb;
-  const helv = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
-  const helvB = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-
-  function textLines(text, maxW, size){
-    const words = String(text).split(' ');
-    const out=[]; let cur='';
-    words.forEach(w=>{
-      const test=(cur?cur+' ':'')+w;
-      if(helv.widthOfTextAtSize(test, size) <= maxW) cur=test;
-      else{ if(cur) out.push(cur); cur=w; }
-    });
-    if(cur) out.push(cur);
-    return out;
-  }
-  const headerH = titleSize + 12 + headSize + 12;
-  let rowsH = 0;
-  rows.forEach(r=>{
-    const lines = textLines(r.desc, colDesc-6, bodySize).length || 1;
-    rowsH += Math.max(lineH, lines*lineH) + 6;
-  });
-  const footerH = 20;
-  const needed = margin + headerH + rowsH + footerH + margin;
-  const available = height;
-
-  if(mode==='ultima' && needed > available){
-    const scale = (available - 2*margin) / (needed - 2*margin);
-    titleSize *= scale;
-    headSize  *= scale;
-    bodySize  *= scale;
-    lineH     *= scale;
-  }
-
-  let y = height - margin;
-
-  page.drawText('Orçamento / Proposta Comercial', {
-    x: margin, y: y - titleSize, size: titleSize, font: helvB, color: rgb(0,0,0)
-  });
-  y -= (titleSize + 12);
-
-  function headerCell(txt, x){ page.drawText(txt, {x, y: y - headSize, size: headSize, font: helvB, color: rgb(0,0,0)}); }
-  headerCell('Nº', margin);
-  headerCell('Descrição do Produto', margin+colN);
-  headerCell('Preço', margin+colN+colDesc);
-  headerCell('Qt.', margin+colN+colDesc+colPreco);
-  headerCell('Total', margin+colN+colDesc+colPreco+colQt);
-  y -= (headSize + 6);
-  page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:1, color: rgb(0,0,0)});
-  y -= 6;
-
-  function drawRow(r){
-    const descLines = textLines(r.desc, colDesc-6, bodySize);
-    const rowHeight = Math.max(lineH, descLines.length*lineH);
-
-    if(mode==='nova' && (y - rowHeight) < margin + 60){
-      const newPage = pdfDoc.addPage([width, height]);
-      y = height - margin;
-      page = newPage;
-      page.drawText('Orçamento / Proposta Comercial (cont.)', {
-        x: margin, y: y - titleSize, size: titleSize, font: helvB, color: rgb(0,0,0)
-      });
-      y -= (titleSize + 12);
-      page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:1, color: rgb(0,0,0)});
-      y -= 6;
-    }
-
-    page.drawText(String(r.i).padStart(2,'0'), {x:margin, y: y - bodySize, size: bodySize, font: helv, color: rgb(0,0,0)});
-
-    let ly = y - bodySize;
-    descLines.forEach(line=>{
-      page.drawText(line, {x: margin+colN, y: ly, size: bodySize, font: helv, color: rgb(0,0,0)});
-      ly -= lineH;
-    });
-
-    function drawRight(text, xRight){
-      const w = helv.widthOfTextAtSize(text, bodySize);
-      page.drawText(text, {x: xRight - w, y: y - bodySize, size: bodySize, font: helv, color: rgb(0,0,0)});
-    }
-    drawRight(BRL(r.preco), margin+colN+colDesc+colPreco-6);
-    drawRight(String(r.qt),  margin+colN+colDesc+colPreco+colQt-6);
-    drawRight(BRL(r.total), width - margin - 6);
-
-    y -= rowHeight;
-    page.drawLine({start:{x:margin, y}, end:{x:width-margin, y}, thickness:.5, color: rgb(0,0,0)});
-  }
-
-  rows.forEach(drawRow);
-
-  y -= 14;
-  const label = 'Mensalidade: ' + BRL(mensal);
-  const wlab = helvB.widthOfTextAtSize(label, 12);
-  page.drawText(label, {x: width - margin - wlab, y: y - 12, size:12, font: helvB, color: rgb(0,0,0)});
-}
-
-/* Botão: gerar a partir de PDF */
-$('#btnGenerateFromPdf').addEventListener('click', async ()=>{
-  const file = $('#pdfBaseFile').files?.[0];
-  const mode = $('#pdfInsertMode').value; // 'nova' | 'ultima'
-  const err = $('#pdfError'); err.style.display='none'; err.textContent='';
-  if(!file){ err.textContent='Selecione um PDF de proposta.'; err.style.display='block'; return; }
-
-  try{
-    let arrayBuf;
-    if (file.arrayBuffer) arrayBuf = await file.arrayBuffer();
-    else arrayBuf = await new Response(file).arrayBuffer();
-
-    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuf);
-    let page;
-
-    if(mode==='nova'){
-      page = pdfDoc.addPage();
-    }else{
-      const pages = pdfDoc.getPages();
-      page = pages[pages.length-1];
-    }
-
-    await drawOrcamentoOnPage(pdfDoc, page, mode);
-
-    const out = await pdfDoc.save();
-    const blob = new Blob([out], {type:'application/pdf'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href=url; a.download='proposta-camerite.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
-    $('#overlayPdf').classList.remove('show');
-  }catch(e){
-    err.textContent = 'Falha ao gerar PDF: ' + (e?.message||e);
-    err.style.display='block';
+    document.getElementById('auth-gate-camerite').style.display = 'none';
   }
 });
 
-/* ===== Principal ===== */
-function computeAll(){ const sim = buildSimulacao(); updateKPIs(sim); }
-function init(){ load(); computeAll(); updateToggleButtons(); }
-init();
-
-/* ===== Supabase Auth ===== */
-(function(){
-  const PROJECT_URL = "https://osqzsennjsmopxjdxlss.supabase.co";
-  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXpzZW5uanNtb3B4amR4bHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjcyMjQsImV4cCI6MjA3NjgwMzIyNH0.nZKK-oHhZiZz8AA5x3EQYyGt8O5gvjfj_mWazniMOpU";
-  const authGate = document.getElementById('auth-gate-camerite');
-  const form = document.getElementById('auth-form');
-  const emailEl = document.getElementById('auth-email');
-  const errorEl = document.getElementById('auth-error');
-
-  const client = window.supabase.createClient(PROJECT_URL, ANON_KEY, { auth: { persistSession: true, storageKey: 'camerite-auth' } });
-  window.cameriteSupabase = client;
-
-  function showGate(){ authGate.style.display = 'block'; }
-  function hideGate(){ authGate.style.display = 'none'; }
-
-  client.auth.getSession().then(({ data } )=> {
-    if (data && data.session) { localStorage.setItem('camerite_auth_ok','1'); hideGate(); }
-    else { showGate(); }
+/* ===== Inicialização ===== */
+function computeAll(){
+  buildSimulacao();
+}
+$$('input, select').forEach(el=>{
+  el.addEventListener('change', ()=>{
+    if(el.type==='text' && el.inputMode==='decimal') setMoney2(el);
+    computeAll(); save();
   });
-
-  client.auth.onAuthStateChange((_event, session)=>{
-    if (session) { localStorage.setItem('camerite_auth_ok','1'); hideGate(); }
-    else { localStorage.removeItem('camerite_auth_ok'); showGate(); }
-  });
-
-  form.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    errorEl.style.display = 'none';
-    const email = emailEl.value.trim();
-    const password = document.getElementById('auth-password').value;
-    const btn = document.getElementById('auth-submit');
-    btn.disabled = true; btn.textContent = 'Entrando...';
-    const { error } = await client.auth.signInWithPassword({ email, password });
-    if (error) { errorEl.textContent = error.message || 'Falha no login. Verifique suas credenciais.'; errorEl.style.display = 'block'; }
-    btn.disabled = false; btn.textContent = 'Entrar';
-  });
-
-  window.cameriteLogout = async function() {
-    await client.auth.signOut();
-    localStorage.removeItem('camerite_auth_ok');
-    showGate();
-  };
-})();
+});
+window.addEventListener('load', ()=>{
+  load();
+  computeAll();
+});
 </script>
-
 </body>
 </html>
