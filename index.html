@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Camerite • Calculadora do Franqueado</title>
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=suKUcnns-YotPYEnUQgrXE-fNK0xTVAo70rISy3-Y3KOCX25NKMGc2iOrAHlXcg56F-17XzdL3ksBCs0SVVCpnYvVy8BNr-h8vw2hzwvBb2ISW9GaeYMlutaedDsFQdlRoH4OINmyBTC03Y8GO8qewEFVAkoe0jhPSWZlwpHXcMflEK4KcmbV2xYR9pr6hMN9MHqnT7YjgGVzqv7jp4A8CmnZYCkoft_XoBrU4LzYyJg0EwcAkbj8byYn2U82mizHx0kArvtHQA6tGxFaI_Jpg" charset="UTF-8"></script><style>
+  :root{
+    --bg:#0f0b22;
+    --panel:#171235;
+    --panel-2:#140e2b;
+    --text:#F2EDFF;
+    --muted:#CFC7E8;
+    --muted-2:#a99fd1;
+    --brand:#7B48EA;
+    --brand-2:#5d31c9;
+    --brand-3:#D3C2F8;
+    --ink:#29184E;
+    --ok:#49e68a;
+    --bad:#ff8c8c;
+    --line: rgba(255,255,255,.12);
+    --line-strong: rgba(255,255,255,.32);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; padding:0; background:radial-gradient(1200px 600px at 20% -10%, #2b1b5d 0%, #120a24 42%, #0c0720 100%); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+  header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; padding:14px 16px;
+    background:linear-gradient(180deg, rgba(20,14,43,.92), rgba(20,14,43,.70));
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  header .brand{display:flex; align-items:center; gap:12px}
+  header .brand img{height:32px; width:auto; display:block}
+  .btn{
+    height:40px; padding:0 14px; border-radius:12px; border:1px solid transparent; cursor:pointer; font-weight:700;
+    background:linear-gradient(180deg, var(--brand), var(--brand-2)); color:#fff;
+    box-shadow: 0 6px 16px rgba(123,72,234,.25);
+  }
+  .btn.secondary{
+    background:#201745; color:#fff; border:1px solid var(--line-strong); box-shadow:none;
+  }
+  .btn.ghost{background:transparent; border:1px solid var(--line); color:var(--text)}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media (max-width:920px){ .row{grid-template-columns:1fr} }
+
+  .container{max-width:1200px; margin:18px auto; padding:0 16px}
+  .card{
+    background:linear-gradient(180deg, #1b1340, #140e2b);
+    border:1px solid var(--line);
+    border-radius:16px; padding:16px;
+    box-shadow: 0 10px 24px rgba(10,5,20,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  h2{margin:0 0 12px 0; font-size:18px}
+  h3{margin:0 0 10px 0; font-size:15px; color:var(--muted)}
+  label{display:grid; gap:6px; font-size:13px; color:var(--muted)}
+  input[type="number"], input[type="text"], input[type="email"], input[type="password"], select{
+    height:42px; padding:0 10px; border-radius:12px; border:1px solid var(--line); background:var(--panel-2); color:var(--text);
+  }
+  input[type="checkbox"]{transform:translateY(1px)}
+  .help{font-size:12px; color:var(--muted-2)}
+  .muted{color:var(--muted-2)}
+
+  /* Segmented control */
+  .seg{display:inline-flex; background:#1c1443; border:1px solid var(--line); border-radius:12px; padding:4px}
+  .seg button{
+    border:0; background:transparent; color:#DAD2FF; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700
+  }
+  .seg button.active{background:linear-gradient(180deg, #7B48EA,#5d31c9); color:#fff; box-shadow: 0 6px 18px rgba(123,72,234,.25)}
+
+  /* Abas (tabs) */
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 16px 0}
+  .tabs button{
+    height:36px; padding:0 12px; border-radius:10px; border:1px solid var(--line); background:#1a123c; color:#fff; cursor:pointer; font-weight:700
+  }
+  .tabs button.active{border-color:var(--brand-3); box-shadow: inset 0 0 0 1px var(--brand-3)}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* Selects com contraste forte */
+  .select-strong{
+    border:1px solid var(--brand-3) !important;
+    background:linear-gradient(180deg, #1a1238,#110a28);
+    box-shadow: inset 0 0 0 2px rgba(211,194,248,.14);
+    color:#fff;
+  }
+
+  /* KPIs */
+  .kpis{display:grid; gap:12px; grid-template-columns:repeat(6, 1fr)}
+  @media (max-width:1200px){ .kpis{grid-template-columns:repeat(3, 1fr)} }
+  @media (max-width:720px){ .kpis{grid-template-columns:repeat(2, 1fr)} }
+  .kpis .box{background:#1a1240; border:1px solid var(--line); border-radius:14px; padding:14px}
+  .kpis .name{font-size:12px; color:var(--muted)}
+  .kpis .val{font-size:18px; font-weight:800; margin-top:6px}
+
+  /* Tabelas */
+  table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px; border:1px solid var(--line)}
+  thead th{position:sticky; top:0; background:#1a1440; color:#eae6ff; font-weight:800; font-size:12px; text-align:left; padding:10px; border-bottom:1px solid var(--line)}
+  tbody td{padding:10px; border-bottom:1px solid var(--line); font-size:13px}
+  .col-num{width:56px}
+  .col-preco{width:160px}
+  .col-qt{width:100px}
+  .col-total{width:180px; text-align:right}
+
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+
+  /* Overlays (modais) */
+  .overlay{
+    position:fixed; inset:0; display:none; place-items:center;
+    background:rgba(10,6,20,.8); backdrop-filter: blur(4px); z-index:1000;
+    color:var(--text);
+    color-scheme: dark;
+  }
+  .overlay .dialog{
+    width:min(820px, 92vw); background:linear-gradient(180deg, #1e1648,#130c2a); border:1px solid var(--line-strong); border-radius:16px; padding:16px; box-shadow: 0 30px 50px rgba(0,0,0,.45);
+    color:var(--text);
+  }
+  .overlay .dialog h3{color:#fff}
+  .overlay .dialog .footer{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
+  .overlay.show{display:grid}
+
+  /* Inputs fortes dentro dos modais */
+  .overlay .dialog input[type="text"],
+  .overlay .dialog input[type="email"],
+  .overlay .dialog input[type="password"],
+  .overlay .dialog input[type="file"],
+  .overlay .dialog select{
+    background:#1a1238; color:var(--text); border:1px solid var(--line-strong);
+  }
+  .overlay .dialog input[type="file"]{
+    padding:8px; height:auto; border-radius:10px;
+  }
+  .overlay .dialog input[type="file"]::file-selector-button{
+    margin-right:8px; padding:8px 12px; border:0; border-radius:8px; cursor:pointer; font-weight:700;
+    background:linear-gradient(180deg, var(--brand), var(--brand-2)); color:#fff;
+  }
+
+  /* Correção extra de contraste do dropdown nativo */
+  .overlay select,
+  .overlay option{
+    background-color:#1a1238 !important;
+    color:#F2EDFF !important;
+  }
+  .overlay select:focus,
+  .overlay option:focus,
+  .overlay option:hover{
+    background-color:#29184E !important;
+    color:#FFFFFF !important;
+  }
+  .overlay select::-ms-expand{
+    background-color:#1a1238;
+    color:#F2EDFF;
+  }
+
+  /* Printable orçamento */
+  #orcamentoPrint{display:none}
+  @media print{
+    body{background:#fff}
+    header, #top-fixed, #tabs, #overlayProdutoCustos, #overlayPdf, #dashboardBlock{display:none !important}
+    #orcamentoPrint{display:block}
+    #orcamentoPrint .container{max-width:none; padding:0}
+    #orcamentoPrint h2{color:#000}
+    #orcamentoPrint table{border-color:#000}
+    #orcamentoPrint thead th{background:#f2f2f2; color:#000; border-color:#000}
+    #orcamentoPrint tbody td{color:#000; border-color:#000}
+    #orcamentoPrint .grand{color:#000}
+  }
+
+  /* Correção de contraste dos selects gerais */
+  select, option {
+    background-color: #1a1238 !important;
+    color: #F2EDFF !important;
+  }
+  select:focus, option:focus, option:hover {
+    background-color: #29184E !important;
+    color: #FFFFFF !important;
+  }
+  select::-ms-expand {
+    background-color: #1a1238;
+    color: #F2EDFF;
+  }
+
+  /* Header c/ ações nas cards */
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;
+  }
+  .card-head h3{margin:0}
+  .btn.small{height:32px; padding:0 10px; border-radius:10px; font-size:12px}
+
+  /* ===== Estilos adicionais apenas para a visualização pivot da aba 6 ===== */
+  .table-scroll{ overflow:auto; border-radius:12px; }
+  #t6 .table-scroll table{ width:auto; min-width:100%; }
+  th.item-col, td.item-col{
+    position:sticky; left:0; background:#1a1440; z-index:1;
+  }
+  tr.total-row td{ font-weight:800; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="https://i.imgur.com/DZtsKz2.png" alt="Camerite" />
+  </div>
+  <div style="display:flex; gap:8px">
+    <button id="btnExportar" class="btn">Exportar PDF</button>
+    <button id="btnApagar" class="btn ghost">Apagar tudo</button>
+  </div>
+</header>
+
+<!-- 1) MODELO -->
+<div class="container" id="top-fixed">
+  <div class="card">
+    <h2>1) Modelo de Comercialização</h2>
+    <div class="seg" role="tablist" aria-label="Modelo">
+      <button id="modeloUsuario" class="active" aria-selected="true">Por Usuário</button>
+      <button id="modeloProduto" aria-selected="false">Por Produto</button>
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <!-- POR USUÁRIO -->
+      <div id="precoPorUsuario" style="display:block">
+        <label>Valor por Usuário
+          <input id="pvPorUsuario" type="text" inputmode="decimal" placeholder="0,00">
+        </label>
+        <div style="margin-top:8px">
+          <button class="btn secondary" type="button" data-open-custos-base>Ver Custos Base</button>
+                  </div>
+      </div>
+
+      <!-- POR PRODUTO -->
+      <div id="precosPorProduto" style="display:none">
+        <div class="row">
+          <label>Preço Armazenamento
+            <input id="pvArmazenamento" type="text" inputmode="decimal" placeholder="R$ 0,00">
+          </label>
+          <label>Preço PMI
+            <input id="pvPMI" type="text" inputmode="decimal" placeholder="R$ 0,00">
+          </label>
+          <label>Preço LPR
+            <input id="pvLPR" type="text" inputmode="decimal" placeholder="R$ 0,00">
+          </label>
+          <label>Preço Toten
+            <input id="pvToten" type="text" inputmode="decimal" placeholder="R$ 0,00">
+          </label>
+          <label>Preço Detecção Movimento
+            <input id="pvDetMov" type="text" inputmode="decimal" placeholder="R$ 0,00">
+          </label>
+          <label>Preço Detecção Pessoas
+            <input id="pvDetPes" type="text" inputmode="decimal" placeholder="R$ 0,00">
+          </label>
+        </div>
+        <div style="margin-top:8px">
+          <button class="btn secondary" type="button" data-open-custos-base>Ver Custos Base</button>
+        </div>
+      </div>
+
+      <div>
+        <label>Quantidade de Usuários
+          <input id="qtdUsuarios" type="number" min="0" step="1" placeholder="0">
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABAS (2 a 6) -->
+<div class="container card" id="tabs">
+  <div class="tabs" role="tablist" aria-label="Seções">
+    <button class="active" data-tab="t2">2) Produtos</button>
+    <button data-tab="t3">3) Custos Mensais Fixos</button>
+    <button data-tab="t4">4) Equipamento</button>
+    <button data-tab="t5">5) Custos de Implantação</button>
+    <button data-tab="t6">6) Simulação por Mês</button>
+  </div>
+
+  <!-- 2) PRODUTOS -->
+  <div class="tab-panel active" id="t2">
+    <div class="row">
+      <label>Armazenamento do Projeto
+        <select id="armazenamentoDias" class="select-strong">
+          <option value="1">1 dia (R$ 15,00)</option>
+          <option value="3">3 dias (R$ 19,00)</option>
+          <option value="7" selected>7 dias (R$ 27,00)</option>
+          <option value="30">30 dias (R$ 45,00)</option>
+        </select>
+      </label>
+
+      <div></div>
+
+      <label>Armazenamento
+        <input id="qtdArmazenamento" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Combo PMI
+        <input id="qtdPMI" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Combo LPR
+        <input id="qtdLPR" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Toten de Monitoramento
+        <input id="qtdToten" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Detecção de Movimento
+        <input id="qtdDetMov" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Detecção de Pessoas
+        <input id="qtdDetPes" type="number" min="0" step="1" placeholder="0">
+      </label>
+    </div>
+  </div>
+
+  <!-- 3) CUSTOS MENSAIS FIXOS -->
+  <div class="tab-panel" id="t3">
+    <div class="row">
+      <label>Royalties por Usuário
+        <input id="royaltyPorUsuario" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <div></div>
+
+      <div class="row" style="grid-column:1/-1">
+        <div class="card" style="background:#1a1440">
+          <h3>Impostos</h3>
+          <div class="row">
+            <label>% Matriz
+              <input id="impMatriz" type="text" inputmode="decimal" placeholder="0,00%">
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; margin-top:24px">
+              <input id="incluiMatriz" type="checkbox"> Incluir
+            </label>
+
+            <label>% Franqueado
+              <input id="impFranqueado" type="text" inputmode="decimal" placeholder="0,00%">
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; margin-top:24px">
+              <input id="incluiFranqueado" type="checkbox"> Incluir
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <label>Internet
+        <input id="fxQtdInternet" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Valor
+        <input id="fxValInternet" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+
+      <label>Energia
+        <input id="fxQtdEnergia" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Valor
+        <input id="fxValEnergia" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+
+      <label>Fundo de Manutenção
+        <input id="fxValFundo" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <div></div>
+
+      <label>Despesa Financeira
+        <input id="fxQtdDespesaFin" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Despesa Financeira
+        <input id="fxValDespesaFin" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+    </div>
+  </div>
+
+  <!-- 4) EQUIPAMENTO -->
+  <div class="tab-panel" id="t4">
+    <div class="row">
+      <label>Câmera LPR
+        <input id="eqValLPR" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Equipamento
+        <select id="eqTipoLPR" class="select-strong">
+          <option value="aquisicao">Aquisição</option>
+          <option value="locacao">Locação</option>
+        </select>
+      </label>
+
+      <label>PMI
+        <input id="eqValPMI" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Equipamento
+        <select id="eqTipoPMI" class="select-strong">
+          <option value="aquisicao">Aquisição</option>
+          <option value="locacao">Locação</option>
+        </select>
+      </label>
+
+      <label>Toten
+        <input id="eqValToten" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <div></div>
+
+      <label>Haste
+        <input id="eqQtdHaste" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Valor
+        <input id="eqValHaste" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+
+      <label>Poste/Caixa
+        <input id="eqQtdPosteCaixa" type="number" min="0" step="1" placeholder="0">
+      </label>
+      <label>Valor
+        <input id="eqValPosteCaixa" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+    </div>
+  </div>
+
+  <!-- 5) CUSTOS DE IMPLANTAÇÃO -->
+  <div class="tab-panel" id="t5">
+    <div class="row">
+      <label>Instalação Câmera
+        <input id="instValCam" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Instalação LPR
+        <input id="instValLPR" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Instalação Toten
+        <input id="instValToten" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Instalação Poste
+        <input id="instValPoste" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Frete
+        <input id="instValFrete" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Valor da Adesão
+        <input id="instValAdesao" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Deslocamento e Outros
+        <input id="instValDesloc" type="text" inputmode="decimal" placeholder="0,00">
+      </label>
+      <label>Margem de Implantação
+        <select id="instMargemPct" class="select-strong">
+          <option value="0">0%</option>
+          <option value="5">5%</option>
+          <option value="10">10%</option>
+          <option value="15" selected>15%</option>
+          <option value="20">20%</option>
+          <option value="30">30%</option>
+          <option value="40">40%</option>
+        </select>
+      </label>
+      <div class="card" style="grid-column:1/-1; background:#1a1440">
+        <h3>Valor de Implantação</h3>
+        <div class="row">
+          <div>
+            <div class="help">Subtotal</div>
+            <div id="instSubtotal" style="font-weight:800; margin-top:6px">R$ 0,00</div>
+          </div>
+          <div>
+            <div class="help">Margem aplicada</div>
+            <div id="instMargemVal" style="font-weight:800; margin-top:6px">R$ 0,00</div>
+          </div>
+          <div>
+            <div class="help">Valor Final</div>
+            <div id="instValorFinal" style="font-weight:900; font-size:18px; margin-top:6px">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6) SIMULAÇÃO POR MÊS -->
+  <div class="tab-panel" id="t6">
+    <div class="row">
+      <label>Meses Para Simular
+        <input id="meses" type="number" min="1" max="60" step="1" value="12">
+      </label>
+      <div style="display:flex; gap:8px; align-items:flex-end">
+        <button id="menosMes" class="btn secondary" type="button">− Meses</button>
+        <button id="maisMes" class="btn secondary" type="button">+ Meses</button>
+        <button id="recalc" class="btn" type="button">Recalcular</button>
+      </div>
+    </div>
+
+    <!-- RECEITAS -->
+    <div class="card" style="margin-top:16px; background:#1a1440">
+      <div class="card-head">
+        <h3>Receitas</h3>
+        <button id="toggleRec" class="btn small secondary" type="button">Ocultar Detalhes</button>
+      </div>
+      <div class="table-scroll">
+        <table id="tblReceitas">
+          <thead>
+            <tr><th class="item-col">Item</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DESPESAS -->
+    <div class="card" style="margin-top:16px; background:#1a1440">
+      <div class="card-head">
+        <h3>Despesas</h3>
+        <button id="toggleDesp" class="btn small secondary" type="button">Ocultar Detalhes</button>
+      </div>
+      <div class="table-scroll">
+        <table id="tblDespesas">
+          <thead>
+            <tr><th class="item-col">Item</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SALDO -->
+    <div class="card" style="margin-top:16px; background:#1a1440">
+      <h3>Saldo</h3>
+      <div class="table-scroll">
+        <table id="tblSaldo">
+          <thead>
+            <tr><th class="item-col">Item</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7) DASHBOARD -->
+<div class="container" id="dashboardBlock">
+  <div class="card" style="margin-top:16px">
+    <h2>7) Dashboard</h2>
+    <div class="kpis">
+      <div class="box"><div class="name">Valor do Contrato Anual</div><div class="val" id="kContratoAnual">R$ 0,00</div></div>
+      <div class="box"><div class="name">Receita Mensal</div><div class="val" id="kReceitaMes">R$ 0,00</div></div>
+      <div class="box"><div class="name">Custo Mensal (Franqueado)</div><div class="val" id="kCustoMes">R$ 0,00</div></div>
+      <div class="box"><div class="name">Imposto Mês</div><div class="val" id="kImpostoMes">R$ 0,00</div></div>
+      <div class="box"><div class="name">Custo do Franqueado Anual</div><div class="val" id="kCustoFranqueadoTotal">R$ 0,00</div></div>
+      <div class="box"><div class="name">Saldo Acumulado</div><div class="val" id="kSaldoAcum12">R$ 0,00</div></div>
+      <div class="box"><div class="name">Rentabilidade</div><div class="val" id="kRentab">0,00%</div></div>
+      <div class="box"><div class="name">Mês de Equilíbrio</div><div class="val" id="kMesEquilibrio">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRINT (Orçamento) ===== -->
+<div id="orcamentoPrint">
+  <div class="container">
+    <h2>Orçamento / Proposta Comercial</h2>
+    <table id="tblOrc">
+      <thead>
+        <tr>
+          <th class="col-num">Nº</th>
+          <th>Descrição do Produto</th>
+          <th class="col-preco">Preço</th>
+          <th class="col-qt">Qt.</th>
+          <th class="col-total">Total</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="footer"><div class="grand" id="grandMensal">Mensalidade: R$ 0,00</div></div>
+  </div>
+</div>
+
+<!-- ===== Overlay: Custos Base ===== -->
+<div class="overlay" id="overlayProdutoCustos" role="dialog" aria-modal="true" aria-label="Custos base">
+  <div class="dialog">
+    <h3>Custos Serviços</h3>
+    <table>
+      <thead><tr><th>Item</th><th>Critério</th><th>Custo</th></tr></thead>
+      <tbody>
+        <tr><td>Armazenamento</td><td>1 dia</td><td>R$ 15,00</td></tr>
+        <tr><td>Armazenamento</td><td>3 dias</td><td>R$ 19,00</td></tr>
+        <tr><td>Armazenamento</td><td>7 dias</td><td>R$ 27,00</td></tr>
+        <tr><td>Armazenamento</td><td>30 dias</td><td>R$ 45,00</td></tr>
+        <tr><td>LPR</td><td>Analítico</td><td>R$ 113,00</td></tr>
+        <tr><td>Detecção de Pessoas</td><td>Analítico</td><td>R$ 42,00</td></tr>
+        <tr><td>Detecção de Movimento</td><td>Analítico</td><td>R$ 30,00</td></tr>
+      </tbody>
+    </table>
+    <div class="footer">
+      <button class="btn secondary" type="button" id="closeCustosBase">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Overlay: PDF ===== -->
+<div class="overlay" id="overlayPdf" role="dialog" aria-modal="true" aria-label="Exportar PDF">
+  <div class="dialog">
+    <h3>Exportar PDF</h3>
+    <div class="row">
+      <div class="card" style="background:#1a1440">
+        <h3>Gerar somente orçamento</h3>
+        <p class="help">Gera o PDF a partir do layout interno desta página.</p>
+        <button id="btnPrintOnly" class="btn" type="button">Gerar agora</button>
+      </div>
+      <div class="card" style="background:#1a1440">
+        <h3>Gerar a partir de proposta</h3>
+        <p class="help">Envie um PDF de proposta pronto e escolha se o orçamento entra em uma <b>nova folha</b> (padrão) ou <b>em cima da última folha</b>.</p>
+        <label>Selecionar PDF de proposta
+          <input id="pdfBaseFile" type="file" accept="application/pdf">
+        </label>
+        <label>Modo de inserção
+          <select id="pdfInsertMode" class="select-strong">
+            <option value="nova" selected>Gerar nova folha no final</option>
+            <option value="ultima">Gerar em cima da última folha</option>
+          </select>
+        </label>
+        <div style="display:flex; gap:8px; margin-top:10px">
+          <button id="btnGenerateFromPdf" class="btn" type="button">Gerar a partir do PDF</button>
+          <button id="btnClosePdf" class="btn secondary" type="button">Fechar</button>
+        </div>
+        <div id="pdfError" class="help" style="color:#ffb0b0; display:none; margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- === Auth (Supabase) === -->
+<div id="auth-gate-camerite" style="position:fixed; inset:0; display:none; place-items:center; background:rgba(9,5,20,.92); z-index:2000;">
+  <div style="width:min(420px,92vw); background:linear-gradient(180deg, #1e1648,#130c2a); border:1px solid var(--line-strong); border-radius:16px; padding:16px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+      <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(180deg, #7B48EA,#29184E); box-shadow:inset 0 0 0 2px rgba(255,255,255,.08)"></div>
+      <div>
+        <div style="font-weight:800; color:#F2EDFF; line-height:1.2">Camerite • Acesso</div>
+        <div style="font-size:12px; color:#CFC7E8">Área restrita: franqueados</div>
+      </div>
+    </div>
+    <form id="auth-form" style="display:grid; gap:12px;">
+      <label style="display:grid; gap:6px; color:#CFC7E8; font-size:13px;">
+        E-mail
+        <input id="auth-email" type="email" required autocomplete="username" style="height:44px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#140e2b; color:#F2EDFF; padding:0 12px;">
+      </label>
+      <label style="display:grid; gap:6px; color:#CFC7E8; font-size:13px;">
+        Senha
+        <input id="auth-password" type="password" required autocomplete="current-password" style="height:44px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#140e2b; color:#F2EDFF; padding:0 12px;">
+      </label>
+      <button id="auth-submit" class="btn" type="submit">Entrar</button>
+      <div id="auth-error" class="help" style="color:#ffb0b0; display:none"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const BRL = v => (isNaN(v)?0:v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const moneyToNum = s=>{
+  if(typeof s==='number') return s;
+  if(!s) return 0;
+  let x = String(s).replace(/[^\d,-]/g,'').replace(/\.(?=\d{3,})/g,'');
+  x = x.replace(',', '.');
+  const n = parseFloat(x);
+  return isNaN(n)?0:n;
+};
+const pctToNum = s=>{
+  if(typeof s==='number') return s;
+  if(!s) return 0;
+  const n = parseFloat(String(s).replace('%','').replace(',','.'));
+  return isNaN(n)?0:n;
+};
+// === Máscara dinâmica com "R$" fixo ao digitar (moeda) ===
+function formatMoneyLive(el) {
+  let val = el.value.replace(/\D/g, '');
+  if (val === '') { el.value = 'R$ '; return; }
+  val = (parseInt(val, 10) / 100).toFixed(2);
+  el.value = 'R$ ' + val.replace('.', ',');
+}
+// Formata moeda ao sair do campo/mudar
+const setMoney2 = (el) => {
+  const n = moneyToNum(el.value);
+  const val = isNaN(n) ? 0 : n;
+  el.value = 'R$ ' + val.toFixed(2).replace('.', ',');
+};
+
+// === Máscara dinâmica de percentual (sem "R$") ===
+function formatPercentLive(el){
+  let val = el.value.replace(/\D/g, ''); // só dígitos
+  if (val === '') { el.value = '0,00%'; return; }
+  val = (parseInt(val, 10) / 100).toFixed(2).replace('.', ',');
+  el.value = val + '%';
+}
+
+// Formata porcentagem ao sair do campo/mudar
+function setPercent(el){
+  const n = pctToNum(el.value);     // entende "10,15%" → 10.15
+  const val = isNaN(n) ? 0 : n;
+  el.value = val.toFixed(2).replace('.', ',') + '%';
+}
+const storageKey='camerite_calc_v4';
+const I = id => parseInt($('#'+id)?.value||0);
+const M = id => moneyToNum($('#'+id)?.value||0);
+
+/* ===== Modelo ===== */
+function getModelo(){ return $('#modeloProduto').classList.contains('active') ? 'produto' : 'usuario'; }
+function setModelo(m){
+  $('#modeloUsuario').classList.toggle('active', m==='usuario');
+  $('#modeloProduto').classList.toggle('active', m==='produto');
+  $('#precosPorProduto').style.display = (m==='produto')?'block':'none';
+  $('#precoPorUsuario').style.display = (m==='usuario')?'block':'none';
+  computeAll(); save();
+}
+$('#modeloUsuario').addEventListener('click', ()=> setModelo('usuario'));
+$('#modeloProduto').addEventListener('click', ()=> setModelo('produto'));
+
+/* ===== Custos base ===== */
+const custoArmazenamentoMap = {1:15, 3:19, 7:27, 30:45};
+const custoLPRStorage = 45;
+const ANALITICO = { LPR:113, DET_MOV:30, DET_PES:42 };
+function custoArmSelecionado(){ const dias = parseInt($('#armazenamentoDias').value||7); return custoArmazenamentoMap[dias] || 27; }
+
+/* ===== Abas ===== */
+$$('.tabs button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    $$('.tabs button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const id=b.dataset.tab;
+    $$('.tab-panel').forEach(p=>p.classList.remove('active'));
+    $('#'+id).classList.add('active');
+  });
+});
+
+/* ===== Overlays ===== */
+$$('[data-open-custos-base]').forEach(btn=>{
+  btn.addEventListener('click', ()=> $('#overlayProdutoCustos').classList.add('show'));
+});
+$('#closeCustosBase').addEventListener('click', ()=> $('#overlayProdutoCustos').classList.remove('show'));
+
+$('#btnExportar').addEventListener('click', ()=> $('#overlayPdf').classList.add('show'));
+$('#btnClosePdf').addEventListener('click', ()=> $('#overlayPdf').classList.remove('show'));
+$('#btnPrintOnly').addEventListener('click', ()=>{
+  $('#overlayPdf').classList.remove('show');
+  buildPrintable();
+  setTimeout(()=>window.print(), 10);
+});
+
+/* ===== Persistência ===== */
+function collectState(){
+  const st = {};
+  $$('#tabs input, #tabs select, #top-fixed input, #top-fixed select').forEach(el=>{
+    if(!el.id) return;
+    st[el.id] = (el.type==='checkbox') ? !!el.checked : el.value;
+  });
+  st.modelo = getModelo();
+  st.showRecDetails = showRecDetails;
+  st.showDespDetails = showDespDetails;
+  return st;
+}
+function save(){ localStorage.setItem(storageKey, JSON.stringify(collectState())); }
+function load(){
+  const obj = JSON.parse(localStorage.getItem(storageKey)||'{}');
+  Object.entries(obj).forEach(([k,v])=>{
+    if(k==='showRecDetails' || k==='showDespDetails' || k==='modelo') return;
+    const el = $('#'+k);
+    if(!el) return;
+    if(el.type==='checkbox'){ el.checked = !!v; }
+    else{ el.value = v; }
+  });
+  setModelo(obj.modelo||'usuario');
+  showRecDetails = (obj.showRecDetails!==undefined)? !!obj.showRecDetails : true;
+  showDespDetails = (obj.showDespDetails!==undefined)? !!obj.showDespDetails : true;
+  updateToggleButtons();
+}
+
+/* ===== Reset total ===== */
+function resetAll(){
+  try { localStorage.removeItem(storageKey); } catch(e){}
+  // Se quiser garantir, pode limpar tudo do localStorage:
+  // try { localStorage.clear(); } catch(e){}
+  window.location.reload(); // garante que TODOS os campos voltem ao estado inicial
+}
+$('#btnApagar').addEventListener('click', resetAll);
+
+/* ===== Botões de meses (aba 6) ===== */
+function clampMeses(n){ return Math.max(1, Math.min(60, n|0)); }
+$('#maisMes').addEventListener('click', ()=>{
+  $('#meses').value = clampMeses(I('meses') + 1);
+  computeAll(); save();
+});
+$('#menosMes').addEventListener('click', ()=>{
+  $('#meses').value = clampMeses(I('meses') - 1);
+  computeAll(); save();
+});
+$('#recalc').addEventListener('click', ()=>{ computeAll(); save(); });
+
+/* ====== Cálculos ====== */
+function receitaMensalBaseUsuario(){ return I('qtdUsuarios') * M('pvPorUsuario'); }
+function receitaMensalBaseProduto(){
+  return I('qtdArmazenamento')*M('pvArmazenamento')
+       + I('qtdPMI')*M('pvPMI')
+       + I('qtdLPR')*M('pvLPR')
+       + I('qtdToten')*M('pvToten')
+       + I('qtdDetMov')*M('pvDetMov')
+       + I('qtdDetPes')*M('pvDetPes');
+}
+
+/* >>>>>>> Cálculo de implantação (multiplica por quantidades) <<<<<<< */
+function calcImplantacao(){
+  const qtdPMI   = I('qtdPMI');
+  const qtdLPR   = I('qtdLPR');
+  const qtdToten = I('qtdToten');
+  const qtdPoste = I('eqQtdPosteCaixa');
+
+  const subtotal = (qtdPMI   * M('instValCam'))
+                 + (qtdLPR   * M('instValLPR'))
+                 + (qtdToten * M('instValToten'))
+                 + (qtdPoste * M('instValPoste'))
+                 + M('instValFrete') + M('instValAdesao') + M('instValDesloc');
+
+  const margemPct = pctToNum($('#instMargemPct').value);
+  const margemVal = subtotal * (margemPct/100);
+  const total = subtotal + margemVal;
+
+  $('#instSubtotal').textContent = BRL(subtotal);
+  $('#instMargemVal').textContent = BRL(margemVal);
+  $('#instValorFinal').textContent = BRL(total);
+  return {subtotal, margemVal, total};
+}
+
+function calcDespesaArmazenamento(){
+  const qtdBase = I('qtdToten')*4 + I('qtdArmazenamento') + I('qtdPMI');
+  const r1 = qtdBase * custoArmSelecionado();
+  const r2 = I('qtdLPR') * custoLPRStorage;
+  return r1 + r2;
+}
+function calcDespesaCameraPMI(m){
+  const qtdBase = I('qtdToten')*4 + I('qtdPMI');
+  const val = M('eqValPMI') * qtdBase;
+  const tipo = $('#eqTipoPMI').value || 'aquisicao';
+  if(tipo==='aquisicao'){ return m===0 ? val : 0; }
+  return m>=1 ? val : 0;
+}
+function calcDespesaLPR(m){
+  const val = M('eqValLPR') * I('qtdLPR');
+  const tipo = $('#eqTipoLPR').value || 'aquisicao';
+  if(tipo==='aquisicao'){ return m===0 ? val : 0; }
+  return m>=1 ? val : 0;
+}
+function calcDespesaToten(m){
+  const val = M('eqValToten') * I('qtdToten');
+  return m===0 ? val : 0;
+}
+function calcDespesaHastePoste(m){
+  const haste = I('eqQtdHaste') * M('eqValHaste');
+  const poste = I('eqQtdPosteCaixa') * M('eqValPosteCaixa');
+  return m===0 ? (haste + poste) : 0;
+}
+function despInstalacao(m){
+  const val = M('instValCam') + M('instValLPR') + M('instValToten') + M('instValPoste');
+  return m===0 ? val : 0;
+}
+function despFreteDesloc(m){
+  const val = M('instValFrete') + M('instValDesloc');
+  return m===0 ? val : 0;
+}
+function fixosMensaisDetalhados(){
+  const internet = I('fxQtdInternet') * M('fxValInternet');
+  const energia  = I('fxQtdEnergia') * M('fxValEnergia');
+  const despFin  = I('fxQtdDespesaFin') * M('fxValDespesaFin');
+  const roy      = I('qtdUsuarios') * M('royaltyPorUsuario');
+  const unidades = I('qtdToten')*4 + I('qtdPMI') + I('qtdLPR');
+  const manut    = unidades * M('fxValFundo');
+  return {internet, energia, manut, despFin, roy};
+}
+function impostosDoMes(receita, custosSemImp){
+  let impM = 0, impF = 0;
+  if($('#incluiMatriz').checked){ impM = receita * (pctToNum($('#impMatriz').value)/100); }
+  if($('#incluiFranqueado').checked){
+    const base = Math.max(0, receita - custosSemImp - impM);
+    impF = base * (pctToNum($('#impFranqueado').value)/100);
+  }
+  return {impM, impF, total: impM + impF};
+}
+
+/* ===== Quebra de receitas por mês ===== */
+function receitaBreakdown(m){
+  const items = [];
+  let total = 0;
+  const impl = calcImplantacao().total;
+
+  if(m===0){
+    if(impl>0){ items.push(['Implantação', impl]); total += impl; }
+    return {items, total, labels: ['Implantação']};
+  }
+
+  if(getModelo()==='usuario'){
+    const val = receitaMensalBaseUsuario();
+    if(val>0){ items.push(['Usuários', val]); total += val; }
+  }else{
+    const add = (label, val)=>{ if(val>0){ items.push([label, val]); total += val; } };
+    add('Armazenamento',       I('qtdArmazenamento')*M('pvArmazenamento'));
+    add('Combo PMI',           I('qtdPMI')*M('pvPMI'));
+    add('Combo LPR',           I('qtdLPR')*M('pvLPR'));
+    add('Toten',               I('qtdToten')*M('pvToten'));
+    add('Detecção de Movimento', I('qtdDetMov')*M('pvDetMov'));
+    add('Detecção de Pessoas',   I('qtdDetPes')*M('pvDetPes'));
+  }
+  return {items, total};
+}
+
+/* ===== Quebra de despesas por mês ===== */
+function despesasBreakdown(m, receitaDoMes){
+  const items = [];
+  let custosSemImp = 0;
+
+  const add = (label, val)=>{ if(val>0){ items.push([label, val]); custosSemImp += val; } };
+
+  if(m>=1){
+    add('Armazenamento', calcDespesaArmazenamento());
+  }
+  add('Câmera',       calcDespesaCameraPMI(m));
+  add('Câmera LPR',   calcDespesaLPR(m));
+  add('Toten',        calcDespesaToten(m));
+  add('Instalação',   despInstalacao(m));
+  if(m>=1){
+    add('Analítico LPR', I('qtdLPR') * ANALITICO.LPR);
+    add('Detecção de Movimento', I('qtdDetMov') * ANALITICO.DET_MOV);
+    add('Detecção de Pessoas',   I('qtdDetPes') * ANALITICO.DET_PES);
+  }
+  add('Frete/Desloc.', despFreteDesloc(m));
+  add('Haste/Poste+Caixa', calcDespesaHastePoste(m));
+
+  if(m>=1){
+    const fix = fixosMensaisDetalhados();
+    if(fix.internet>0) add('Internet', fix.internet);
+    if(fix.energia>0)  add('Energia',  fix.energia);
+    if(fix.manut>0)    add('Manutenção', fix.manut);
+    if(fix.roy>0)      add('Royalties', fix.roy);
+    if(fix.despFin>0)  add('Despesa Financeira', fix.despFin);
+  }
+
+  const imp = impostosDoMes(receitaDoMes, custosSemImp);
+  const total = custosSemImp + imp.total;
+
+  if(imp.impM>0) items.push(['Imposto Matriz', imp.impM]);
+  if(imp.impF>0) items.push(['Imposto Franqueado', imp.impF]);
+
+  return {items, total, impostos: imp};
+}
+
+/* ===== Flags de detalhe ===== */
+let showRecDetails = true;
+let showDespDetails = true;
+function updateToggleButtons(){
+  $('#toggleRec').textContent  = showRecDetails ? 'Ocultar Detalhes' : 'Mostrar detalhes';
+  $('#toggleDesp').textContent = showDespDetails ? 'Ocultar Detalhes' : 'Mostrar detalhes';
+}
+$('#toggleRec').addEventListener('click', ()=>{ showRecDetails = !showRecDetails; updateToggleButtons(); computeAll(); save(); });
+$('#toggleDesp').addEventListener('click', ()=>{ showDespDetails = !showDespDetails; updateToggleButtons(); computeAll(); save(); });
+
+/* ===== Montagem das tabelas (VISUALIZAÇÃO PIVOT) ===== */
+function ensureScrollWrap(tbl){
+  if(!tbl) return;
+  const parent = tbl.parentElement;
+  if(!parent || !parent.classList || !parent.classList.contains('table-scroll')){
+    const wrap = document.createElement('div');
+    wrap.className = 'table-scroll';
+    tbl.parentNode.insertBefore(wrap, tbl);
+    wrap.appendChild(tbl);
+  }
+}
+function buildPivotHeader(tbl, meses){
+  const thead = tbl.querySelector('thead'); thead.innerHTML='';
+  const tr = document.createElement('tr');
+  const th0 = document.createElement('th');
+  th0.textContent = 'Item';
+  th0.className = 'item-col';
+  tr.appendChild(th0);
+  for(let m=0; m<=meses; m++){
+    const th = document.createElement('th');
+    th.textContent = 'Mês ' + String(m).padStart(2,'0');
+    tr.appendChild(th);
+  }
+  thead.appendChild(tr);
+}
+function fmtCell(val, bold=false, cls=''){
+  if(!val){ return `<td class="${cls}">—</td>`; }
+  return `<td class="${cls}">${bold?'<b>':''}${BRL(val)}${bold?'</b>':''}</td>`;
+}
+
+function buildSimulacao(){
+  const meses = I('meses');
+
+  const tblR = $('#tblReceitas');
+  const tblD = $('#tblDespesas');
+  const tblS = $('#tblSaldo');
+  ensureScrollWrap(tblR);
+  ensureScrollWrap(tblD);
+  ensureScrollWrap(tblS);
+
+  const tbodyR = tblR.querySelector('tbody'); tbodyR.innerHTML='';
+  const tbodyD = tblD.querySelector('tbody'); tbodyD.innerHTML='';
+  const tbodyS = tblS.querySelector('tbody'); tbodyS.innerHTML='';
+
+  buildPivotHeader(tblR, meses);
+  buildPivotHeader(tblD, meses);
+  buildPivotHeader(tblS, meses);
+
+  const recMes = []; const despMes = []; const impMes = []; const saldoMes = []; const saldoAc = [];
+  const recMaps = []; const despMaps = [];
+  const recLabels = []; const despLabels = [];
+  const addLabel = (arr, label)=>{ if(!arr.includes(label)) arr.push(label); };
+
+  for(let m=0; m<=meses; m++){
+    const recB = receitaBreakdown(m);
+    const mapR = new Map(recB.items);
+    recMaps[m] = mapR;
+    recB.items.forEach(([l])=> addLabel(recLabels, l));
+    const recTotal = recB.total;
+    recMes.push(recTotal);
+
+    const despB = despesasBreakdown(m, recTotal);
+    const mapD = new Map(despB.items);
+    despMaps[m] = mapD;
+    despB.items.forEach(([l])=> addLabel(despLabels, l));
+    const despTotal = despB.total;
+    despMes.push(despTotal);
+    impMes.push(despB.impostos.total||0);
+
+    const saldo = recTotal - despTotal;
+    saldoMes.push(saldo);
+    saldoAc.push((saldoAc[m-1]||0) + saldo);
+  }
+
+  // Receitas
+  if(showRecDetails){
+    recLabels.forEach(label=>{
+      let row = `<tr><td class="item-col">${label}</td>`;
+      for(let m=0; m<=meses; m++){
+        const v = recMaps[m].get(label) || 0;
+        row += fmtCell(v);
+      }
+      row += `</tr>`;
+      tbodyR.insertAdjacentHTML('beforeend', row);
+    });
+  }
+  { // Total de Receitas
+    let row = `<tr class="total-row"><td class="item-col">Total de Receitas</td>`;
+    for(let m=0; m<=meses; m++){ row += fmtCell(recMes[m], true); }
+    row += `</tr>`;
+    tbodyR.insertAdjacentHTML('beforeend', row);
+  }
+
+  // Despesas
+  if(showDespDetails){
+    const outros = despLabels.filter(l => l!=='Imposto Matriz' && l!=='Imposto Franqueado');
+    const impostosOrdenados = ['Imposto Matriz','Imposto Franqueado'].filter(l => despLabels.includes(l));
+    const ordered = [...outros, ...impostosOrdenados];
+    ordered.forEach(label=>{
+      let row = `<tr><td class="item-col">${label}</td>`;
+      for(let m=0; m<=meses; m++){
+        const v = despMaps[m].get(label) || 0;
+        row += fmtCell(v);
+      }
+      row += `</tr>`;
+      tbodyD.insertAdjacentHTML('beforeend', row);
+    });
+  }
+  { // Total de Despesas
+    let row = `<tr class="total-row"><td class="item-col">Total de Despesas</td>`;
+    for(let m=0; m<=meses; m++){ row += fmtCell(despMes[m], true); }
+    row += `</tr>`;
+    tbodyD.insertAdjacentHTML('beforeend', row);
+  }
+
+  // Saldo
+  {
+    let rowMes = `<tr><td class="item-col">Saldo do mês</td>`;
+    for(let m=0; m<=meses; m++){
+      const v = saldoMes[m] || 0;
+      const cls = v>=0 ? 'ok' : 'bad';
+      rowMes += fmtCell(v, false, cls);
+    }
+    rowMes += `</tr>`;
+    tbodyS.insertAdjacentHTML('beforeend', rowMes);
+
+    let rowAc = `<tr><td class="item-col">Saldo acumulado</td>`;
+    for(let m=0; m<=meses; m++){
+      const v = saldoAc[m] || 0;
+      const cls = v>=0 ? 'ok' : 'bad';
+      rowAc += fmtCell(v, false, cls);
+    }
+    rowAc += `</tr>`;
+    tbodyS.insertAdjacentHTML('beforeend', rowAc);
+  }
+
+  /* ================= KPI's ================= */
+  $('#kReceitaMes').textContent = BRL(recMes[1]||0);
+  $('#kCustoMes').textContent   = BRL(despMes[1]||0);
+  $('#kImpostoMes').textContent = BRL(impMes[1]||0);
+
+  // Contrato anual: receita mensal * 12 + implantação (mês 0)
+  const contratoAnual = (recMes[1]||0)*12 + (recMes[0]||0);
+  $('#kContratoAnual').textContent = BRL(contratoAnual);
+
+  // Custo franqueado anual (12 meses)
+  let custoAnualFranqueado = 0;
+  for(let m=1; m<=Math.min(12, meses); m++){ custoAnualFranqueado += (despMes[m]||0); }
+  $('#kCustoFranqueadoTotal').textContent = BRL(custoAnualFranqueado);
+
+  // Saldo Acumulado (do último mês simulado, incluindo mês 0)
+  const saldoAcumFinal = saldoAc[Math.min(meses, saldoAc.length-1)] || 0;
+  $('#kSaldoAcum12').textContent = BRL(saldoAcumFinal);
+
+  // Rentabilidade: Saldo Acumulado / Valor do Contrato Anual (2 casas). Se contrato = 0 → 0,00%
+  const rentPct = contratoAnual > 0 ? (saldoAcumFinal / contratoAnual) * 100 : 0;
+  $('#kRentab').textContent = `${rentPct.toFixed(2).replace('.',',')}%`;
+
+  // Mês de equilíbrio (primeiro saldo acumulado >= 0)
+  let mesEq = '—';
+  for(let m=0; m<=meses; m++){ if(saldoAc[m]>=0){ mesEq = `Mês ${String(m).padStart(2,'0')}`; break; } }
+  $('#kMesEquilibrio').textContent = mesEq;
+}
+
+function buildPrintable(){
+  const tbody = $('#tblOrc tbody'); tbody.innerHTML = '';
+  let i=1, grand=0;
+
+  const push = (desc, preco, qt) =>{
+    if(!preco || !qt) return;
+    const total = preco*qt; grand += total;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="col-num">${i++}</td>
+      <td>${desc}</td>
+      <td class="col-preco">${BRL(preco)}</td>
+      <td class="col-qt">${qt}</td>
+      <td class="col-total">${BRL(total)}</td>`;
+    tbody.appendChild(tr);
+  };
+
+  if(getModelo()==='usuario'){
+    push('Usuários', M('pvPorUsuario'), I('qtdUsuarios'));
+  }else{
+    push('Armazenamento', M('pvArmazenamento'), I('qtdArmazenamento'));
+    push('PMI', M('pvPMI'), I('qtdPMI'));
+    push('LPR', M('pvLPR'), I('qtdLPR'));
+    push('Toten', M('pvToten'), I('qtdToten'));
+    push('Detecção de Movimento', M('pvDetMov'), I('qtdDetMov'));
+    push('Detecção de Pessoas', M('pvDetPes'), I('qtdDetPes'));
+  }
+
+  $('#grandMensal').textContent = `Mensalidade: ${BRL(grand)}`;
+}
+
+/* ===== Auth (fake) ===== */
+async function fakeSupabaseSignIn(email, password){
+  return { error: null };
+}
+document.getElementById('auth-form')?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('auth-submit');
+  btn.disabled = true; btn.textContent = 'Entrando...';
+  const { error } = await fakeSupabaseSignIn(
+    document.getElementById('auth-email').value,
+    document.getElementById('auth-password').value
+  );
+  if(error){
+    document.getElementById('auth-error').textContent = error.message || 'Erro ao entrar';
+    document.getElementById('auth-error').style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }else{
+    document.getElementById('auth-gate-camerite').style.display = 'none';
+  }
+});
+
+/* ===== Inicialização ===== */
+/* ===== Inicialização ===== */
+function computeAll(){
+  buildSimulacao();
+}
+
+// CHANGE: formata ao sair do campo (moeda x %)
+$$('input, select').forEach(el=>{
+  el.addEventListener('change', ()=>{
+    if (el.type === 'text' && el.inputMode === 'decimal') {
+      if (el.id === 'impMatriz' || el.id === 'impFranqueado') {
+        setPercent(el);   // % só nos dois de impostos
+      } else {
+        setMoney2(el);    // R$ nos demais
+      }
+    }
+    computeAll(); 
+    save();
+  });
+});
+
+// INPUT: máscara enquanto digita, diferenciando por id
+$$('input[type="text"][inputmode="decimal"]').forEach(el=>{
+  if (el.id === 'impMatriz' || el.id === 'impFranqueado') {
+    // Percentual
+    if (!el.value) el.value = '0,00%';
+    el.placeholder = '0,00%';
+    el.addEventListener('input', ()=> formatPercentLive(el));
+    el.addEventListener('blur',  ()=> setPercent(el));
+  } else {
+    // Moeda
+    if (!el.value) el.value = 'R$ ';
+    el.addEventListener('input', ()=> formatMoneyLive(el));
+    // protege o prefixo "R$ "
+    el.addEventListener('keydown', (e)=>{
+      if ((e.key === 'Backspace' || e.key === 'Delete') && el.selectionStart <= 3) {
+        e.preventDefault();
+        el.setSelectionRange(3,3);
+      }
+    });
+  }
+});
+
+// LOAD: aplica a formatação correta para cada tipo logo após carregar do storage
+window.addEventListener('load', ()=>{
+  load();
+
+  $$('input[type="text"][inputmode="decimal"]').forEach(el=>{
+    if (el.id === 'impMatriz' || el.id === 'impFranqueado') {
+      setPercent(el);   // ex.: 10,15%
+    } else {
+      setMoney2(el);    // ex.: R$ 39,90
+    }
+  });
+
+  computeAll();
+});
+</script>
+</body>
+</html>
